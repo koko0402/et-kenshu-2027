@@ -3,88 +3,92 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>第5回 C言語（3）PID制御と状態機械</title>
+<title>第5回 はじめてのC言語</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="site"><div class="inner">
 <a class="title" href="index.html">ETロボコン 新人研修 2027</a>
-<nav><a href="index.html">授業一覧</a><a href="lesson04.html">前の回</a><a href="lesson06.html">次の回</a></nav>
+<nav><a href="index.html">授業一覧</a><a href="appendix1.html">コマンド早見表</a><a href="appendix2.html">用語集</a><a href="lesson04.html">前の回</a><a href="lesson06.html">次の回</a></nav>
 </div></header>
 <main>
-<h1>第5回 C言語（3）PID制御と状態機械</h1>
-<p>走行体のプログラムの中心になる2つ、PID制御と状態機械を書きます。ドリルの問題9〜12をやります。ここで書いたものは、次の回からシミュレータでそのまま使います。</p>
-<p class="prepare">用意するもの：第4回のドリルの続き</p>
+<h1>第5回 はじめてのC言語</h1>
+<p>C言語で、いちばん小さいプログラムを書いて、コンパイルして動かします。走行体のプログラムも、これを大きくしたものです。</p>
+<p class="prepare">用意するもの：第2回で準備したPC</p>
 <h2>説明</h2>
-<h3>PID制御</h3>
-<p>ライントレースでは、カラーセンサで線の縁を見て、明るすぎたら線のほうへ、暗すぎたら線の外へ曲がります。どれだけ曲がるかを決める方法の一つが PID制御です。</p>
-<p>ずれ（error）を「今の明るさ − 目標の明るさ」とすると、</p>
-<pre><code>P = KP × 今のずれ
-I = KI × これまでのずれの合計
-D = KD × （今のずれ − 前回のずれ）
-曲がる量 = P + I + D</code></pre>
-<p>P は今どれだけずれているか、I はずれがどれだけたまっているか、D はずれがどれだけ速く変わっているかを見ています。ライントレースでは I はあまり使わず、P と D で走ることが多いです。どの値がどう効くかは、第6回にシミュレータで実際に見ます。</p>
-<p>D を計算するには前回のずれが要るので、それを構造体に覚えておきます（第4回の「前の値を覚えておく」と同じです）。</p>
-<h3>状態機械</h3>
-<p>走行体は、区間によってやることが変わります。線をたどる、ブロックに近づく、押す、下がる、回る……。今どれをやっているかを「状態」として持っておいて、何かが起きたら次の状態に移る、という作り方を状態機械といいます。</p>
-<p>C では <code>enum</code> で状態に名前を付けて、<code>switch</code> で切り替えます。</p>
-<pre><code>typedef enum { ST_IDLE, ST_RUNNING, ST_STOPPED } State;
+<h3>いちばん小さいプログラム</h3>
+<pre><code>#include &lt;stdio.h&gt;
 
-switch (state) {
-case ST_IDLE:
-    if (button_pressed) state = ST_RUNNING;
-    break;
-case ST_RUNNING:
-    if (goal_reached) state = ST_STOPPED;
-    break;
-...
+int main(void)
+{
+    printf("こんにちは ETロボコン\n");
+    return 0;
 }</code></pre>
-<p>モデル図の状態機械図と、このコードはそのまま対応します。図の矢印1本が、<code>case</code> の中の <code>if</code> 1つです。モデル審査で「モデルとコードが対応しているか」を見られるのは、こういうところです。</p>
-<h3>見間違いを防ぐ</h3>
-<p>センサやカメラは、一瞬だけ違う値を出すことがあります。2026年は青い印を一瞬見間違えて、早く曲がってしまうことがありました。「何回か続けて見えたら本物とみなす」ようにすると防げます。問題11がその練習です。</p>
+<p>1行ずつ見ていきます。</p>
+<p><code>#include &lt;stdio.h&gt;</code> は、画面に文字を出す <code>printf</code> などを使うための準備です。おまじないだと思って構いません。</p>
+<p><code>int main(void)</code> から <code>}</code> までが、プログラムの本体です。プログラムは必ず <code>main</code> から始まります。</p>
+<p><code>printf("...\n");</code> は画面に文字を出します。<code>\n</code> は改行です。C では、命令の最後に <code>;</code> を付けます。</p>
+<p><code>return 0;</code> は「正常に終わった」と知らせます。</p>
+<h3>コンパイルして動かす</h3>
+<p>C は、書いたらコンパイルしてから動かします。</p>
+<pre><code>$ gcc -Wall -o hello hello.c
+$ ./hello
+こんにちは ETロボコン</code></pre>
+<p><code>gcc</code> がコンパイラで、<code>hello.c</code> から <code>hello</code>（Windows では <code>hello.exe</code>）という実行ファイルを作ります。<code>-Wall</code> は怪しい書き方を全部「警告」として教えてくれる指定です。<code>-o hello</code> は、できる実行ファイルの名前です。<code>./hello</code> で、今いるフォルダの hello を動かします。</p>
+<p>警告（warning）が出ても実行ファイルはできますが、警告はたいてい本当の間違いです。チームでは警告が1つも出なくなるまで直すことにしています。</p>
+<h3>変数と printf</h3>
+<p>値に名前を付けて覚えておくのが変数です。</p>
+<pre><code>int speed = 70;          /* 整数 */
+float offset = -0.25f;   /* 小数。最後に f を付ける */
+
+printf("速さ %d、ずれ %.2f\n", speed, offset);   /* 速さ 70、ずれ -0.25 */</code></pre>
+<p><code>printf</code> の中の <code>%d</code> には整数が、<code>%f</code> には小数が入ります。<code>%.2f</code> は小数2桁です。</p>
+<h3>関数</h3>
+<p>決まった仕事に名前を付けてまとめたものが関数です。</p>
+<pre><code>float run_point(float lap_time_sec)
+{
+    float point = 35.0f - lap_time_sec;
+    if (point &lt; 0.0f) {
+        point = 0.0f;
+    }
+    return point;
+}</code></pre>
+<p><code>float run_point(float lap_time_sec)</code> は「小数を1つ受け取って、小数を1つ返す、run_point という関数」という意味です。<code>return</code> で結果を返します。<code>if (...) { ... }</code> は、条件が成り立つときだけ中を実行します。</p>
 <h2>手順</h2>
-<p>これまでと同じです。<code>q09_pid.c</code> から順に書いて採点します。最後に <code>sh check.sh</code> で全部まとめて採点して、「合格 12 / 12 問」になれば終わりです。</p>
+<ol>
+<li>VS Code で、デスクトップに <code>c_practice</code> というフォルダを作って開く（「ファイル」→「フォルダーを開く」→ 新しいフォルダー）</li>
+<li>「新しいファイル」で <code>hello.c</code> を作り、上の「いちばん小さいプログラム」を写して保存する。コピーせず、自分の手で打ってください</li>
+<li>
+<p>VS Code の Git Bash で、コンパイルして動かす</p>
+<pre><code>$ gcc -Wall -o hello hello.c
+$ ./hello</code></pre>
+</li>
+<li>
+<p>わざと間違えてみる。<code>printf(...)</code> の行の最後の <code>;</code> を消して保存し、もう一度コンパイルする。どんなエラーが出るか見て、直す</p>
+</li>
+</ol>
 <h2>演習</h2>
-<h3>演習5-1　PID制御（問題9）</h3>
-<details><summary>ヒント</summary>
-
-前回のずれ（`prev_error`）を更新するのは、D を計算したあと。
-
-</details>
-
-<h3>演習5-2　状態機械（問題10）</h3>
-<details><summary>ヒント</summary>
-
-非常停止は「どの状態からでも」なので、`switch` に入る前に1回見れば済む。
-
-</details>
-
-<h3>演習5-3　見間違いを防ぐ（問題11）</h3>
-<details><summary>ヒント</summary>
-
-`false` が来たら数え直し。`true` なら1増やして、決めた回数に届いたら `true` を返す。
-
-</details>
-
-<h3>演習5-4　ログの1行を読む（問題12）</h3>
-<details><summary>ヒント</summary>
-
-`sscanf` は読めた個数を返す。4つ全部読めたときだけ成功にする。
-
-</details>
-
-<h3>演習5-5　状態機械図を描く</h3>
-<p>問題10の状態機械を、紙に状態機械図として描いてください。状態を角の丸い四角、移り変わりを矢印にして、矢印に「何が起きたら」を書きます。描いたら自分のコードと見比べて、矢印と <code>if</code> が1対1になっているか確かめます。</p>
-<h3>演習5-6　本物と比べる</h3>
-<p><code>src/judge/pid_calculator.c</code> を開いて、自分の問題9の答えとどこが違うか探してください。</p>
+<h3>演習5-1　エラーを読む</h3>
+<p>手順4で出たエラーをよく読んでください。次のように出たはずです（文字の数は書いた内容で少し違います）。</p>
+<pre><code>hello.c:5:37: error: expected ';' before 'return'</code></pre>
+<p><code>5:37</code> は何を表していますか。<code>expected ';' before 'return'</code> はどういう意味でしょう。</p>
 <details><summary>答え</summary>
 
-周期（dt）で割っていることと、1回目だけ D を0にしていること（`has_prev_error`）。1回目の D を0にする理由は、第6回の演習で分かる。
+`5:37` は5行目の37文字目。「return の前に ; があるはず」という意味で、5行目の最後に ; が無いことを教えてくれている。今の gcc は抜けた場所の行を指してくれるが、括弧の閉じ忘れなどでは、おかしいと気づいた所（もっと下の行）を指すこともある。指された行におかしな所が無ければ、上の行を見る。エラーがたくさん出ても、直すのはいちばん上の1つ目だけでいいことが多い。
 
 </details>
 
+<h3>演習5-2　走行ポイント</h3>
+<p><code>docs/後輩育成/練習/02_C言語/01_はじめて.c</code> を開いて、<code>run_point()</code> の中を書いてください（アプライドクラスの式、35 − 秒数）。ファイルの先頭に、コンパイルと実行のコマンドが書いてあります。</p>
+<p>次のように出れば完成です。</p>
+<pre><code>LAPまで 18.5秒 → 走行ポイント 16.5
+LAPまで 25.0秒 → 走行ポイント 10.0
+LAPまで 40.2秒 → 走行ポイント 0.0</code></pre>
+<p>答えは同じフォルダの <code>答え/01_はじめて.c</code> にあります。</p>
+<h3>演習5-3　自分で書く</h3>
+<p><code>hello.c</code> を書き換えて、自分の名前と、好きな数字を2つ足した結果を出すプログラムにしてください。</p>
 <h2>次回までに</h2>
-<p>12問全部 ○ にしておいてください。</p><div class="pager"><a href="lesson04.html">← 第4回 C言語（2）関数・構造体</a><a href="lesson06.html">第6回 シミュレータ（1）ライントレース →</a></div>
+<p><code>docs/後輩育成/新人研修2027/ドリル/q01_distance.c</code> を開いて、先頭のコメント（問題文）を読んでおいてください。</p><div class="pager"><a href="lesson04.html">← 第4回 Git で記録する</a><a href="lesson06.html">第6回 C言語 変数・条件・繰り返し →</a></div>
 </main>
 <footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
 </body>

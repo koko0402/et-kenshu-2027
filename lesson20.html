@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第20回 機能を足すときの手順</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="appendix1.html">コマンド早見表</a><a href="appendix2.html">用語集</a><a href="lesson19.html">前の回</a><a href="lesson21.html">次の回</a></nav>
+</div></header>
+<main>
+<h1>第20回 機能を足すときの手順</h1>
+<p>ここまでで、走行体のプログラムを読んで、動かして、ログを読めるようになりました。この回は、自分でプログラムを直したり、機能を足したりするときの手順をやります。2026年10月に実際に「ボトルデリバリー → ET相撲」の走りを足したときに、どのファイルをどの順で触ったかを追いながら進めます。</p>
+<p class="prepare">用意するもの：これまでのPC</p>
+<h2>説明</h2>
+<h3>進め方</h3>
+<p>チームでは、次の順で進めることにしています。</p>
+<pre><code>資料を読む → モデルで考える → 設計 → 作る → ビルド → シミュレータ → 実機 → ログを読む → 直す</code></pre>
+<p>うまくいかなければ、前に戻ります。いちばん大事なのは、プログラムを先に書き始めないことです。少なくとも、何をするか（道順）、どんな状態があって何で切り替わるか（状態機械図、メモでもいい）、失敗したらどうするか（見つからない、見失った、時間切れ）の3つは、先に決めます。</p>
+<h3>ボトルの走りを足したときの順番</h3>
+<p>2026年10月に、LAPのあと「ボトルを運ぶ → ET相撲 → ガレージ」と走るオプション（<code>--bottles</code>）を足しました。そのときの順番です。</p>
+<ol>
+<li>規約とコースの図を読んで、ボトルの置き場、ゾーン、土俵の位置を表にした（<code>docs/設計/ボトル難所攻略設計.md</code>）</li>
+<li>道順と、失敗したときの動きを決めた（同じファイル）</li>
+<li>距離や速さの数字に名前を付けた（<code>config/parameters.h</code>）</li>
+<li>起動オプションを足した（<code>src/app_options.h</code>、<code>src/app_options.c</code>、<code>src/main.c</code>）</li>
+<li>オプションのテストを書いた（<code>test/test_app_options.c</code>）</li>
+<li>手順の本体を新しいファイルに書いた（<code>src/app_bottles.c</code>、<code>src/app_bottles.h</code>）</li>
+<li>ビルドの一覧に足した（<code>Makefile</code>）</li>
+<li>本体の入口から呼んだ（<code>src/app.c</code>）</li>
+<li>シミュレータにボトルを置いて300回走らせて、失敗を1つずつ直した（<code>test/simulator/bottle_world.c</code>）</li>
+<li>決めたことを記録した（<code>docs/設計/判断記録.md</code>）</li>
+</ol>
+<p>最初は成功率0％でしたが、9の「失敗を1回ずつ見て直す」をくり返して、300回中299回まで上がりました。曲線のつなぎ目、青い区間、角、ゾーンの近さ…と、毎回違う原因でした。</p>
+<h3>数字を変えるとき</h3>
+<p><code>config/parameters.h</code> で名前を探して（<code>Ctrl + Shift + F</code>）、値を変えます。そのとき、コメントに「いつ、なぜ、何を見て」変えたかを書きます。</p>
+<pre><code>#define RALLY_LAP_TO_GARAGE_MM   1020   /* [実機 2026-10-02] LAPの青線を見つけてから、ガレージの中で止まるまで。
+                                           1100ではガレージの奥寄りに止まったので減らした */</code></pre>
+<p><code>parameters.h</code> を変えたら、必ずラズパイに送り直してビルドし直します。</p>
+<h3>書き方の決まり</h3>
+<p>チームのプログラムは、次の決まりで書いています（<code>CLAUDE.md</code> にも書いてあります）。</p>
+<p><code>main</code> は始める準備だけにして、中身は役割ごとのファイルに分けます。数字は <code>config/parameters.h</code> に名前を付けて置きます。機械にさわる部分（<code>src/device/</code>）は分けておきます。テストとシミュレータで偽物に差し替えられるようにするためです。</p>
+<p>ログには判断の理由を出します（「◯◯なので△△します」）。実機でうまくいかなかったとき、ログだけで原因が追えるようにするためです。コメントは日本語で「なぜ」を書きます。実機で分かったことには日付を付けます。警告は1つも出ないようにします。</p>
+<h3>記録を残す</h3>
+<p>決めたことは <code>docs/設計/判断記録.md</code> に、日付、決めたこと、理由、影響を書きます。変更は「何を、なぜ」を書いてコミットします。</p>
+<p>なぜそうしたかが残っていないプログラムは、来年だれも直せません。</p>
+<h2>手順</h2>
+<p>この回は、オプションを1つ足してみます。走行体の動きには関係しない、練習用のオプションです。</p>
+<ol>
+<li>練習用のブランチを作る（<code>git switch -c practice-自分の名前のローマ字</code>）</li>
+<li><code>src/app_options.h</code> の構造体に <code>int hello;</code> を足す</li>
+<li><code>src/app_options.c</code> で、初期値を0にして、<code>--hello</code> が来たら1にする（<code>--from-main</code> の書き方をまねする）</li>
+<li><code>src/main.c</code> の <code>--help</code> の説明に1行足す</li>
+<li><code>test/test_app_options.c</code> に、<code>--hello</code> を渡したら <code>hello</code> が1になるテストを足す</li>
+<li><code>sh scripts/local_test.sh</code> で全部 OK になるか確かめる</li>
+<li><code>git diff</code> で変えた所を見直す</li>
+<li>終わったら、元のブランチに戻ってブランチを消す（先輩と一緒に）</li>
+</ol>
+<h2>演習</h2>
+<h3>演習20-1　オプションを足す</h3>
+<p>手順どおりに <code>--hello</code> を足して、テストが通るところまでやってください。</p>
+<h3>演習20-2　設計から考える</h3>
+<p>シミュレータの課題（第12回）で、「ブロックが見つからないまま線の終わりまで来たら、ブロックはあきらめてガレージに向かう」という機能を足すとします。上の10個の順番に当てはめると、何をどの順でやりますか。プログラムを書く前に、紙に書き出してください。そのあと、実際に作って、seed 1〜20 で確かめてください。</p>
+<h2>次回までに</h2>
+<p>次回は、生成AIを開発に使うときの話です。</p><div class="pager"><a href="lesson19.html">← 第19回 本物のプログラムを仮想コースで走らせる</a><a href="lesson21.html">第21回 AIとの付き合い方 →</a></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

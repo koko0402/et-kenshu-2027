@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>付録 用語集</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="appendix1.html">コマンド早見表</a><a href="appendix2.html">用語集</a></nav>
+</div></header>
+<main>
+<h1>付録 用語集</h1>
+<p>授業に出てくる言葉の意味です。分からない言葉が出てきたら、ここを引いてください。</p>
+<h2>大会</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>言葉</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>エントリー・ベーシック・アプライド</td>
+<td>ETロボコンのクラス。うちは2026年にアプライドに出た</td>
+</tr>
+<tr>
+<td>HackSPi dachs</td>
+<td>アプライドクラスの走行体。SPIKE Prime ＋ Raspberry Pi 4 ＋ USBカメラ</td>
+</tr>
+<tr>
+<td>リザルトポイント</td>
+<td>1回の走行の点数。走行ポイント＋課題ポイント</td>
+</tr>
+<tr>
+<td>走行ポイント</td>
+<td>LAPゲートまでの速さで決まる点</td>
+</tr>
+<tr>
+<td>チェックポイント</td>
+<td>前半の途中にあるゲート。通ると点が入る</td>
+</tr>
+<tr>
+<td>LAPゲート</td>
+<td>前半のゴール</td>
+</tr>
+<tr>
+<td>難所</td>
+<td>後半の課題。2026年のアプライドは ETラリー・ET相撲・ボトルデリバリー</td>
+</tr>
+<tr>
+<td>ガレージ</td>
+<td>最後に止まる場所</td>
+</tr>
+<tr>
+<td>キャリブレーション</td>
+<td>走る前に、黒と白の明るさをセンサに覚えさせること</td>
+</tr>
+<tr>
+<td>モデル審査</td>
+<td>提出した設計図（モデル）を審査員が読んで付ける評価</td>
+</tr>
+<tr>
+<td>講評</td>
+<td>大会のあとに届く、審査員からのコメント</td>
+</tr>
+<tr>
+<td>規約</td>
+<td>大会のルールを書いた文書。毎年変わる</td>
+</tr>
+</tbody>
+</table></div>
+<h2>走行体</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>言葉</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ハブ</td>
+<td>SPIKE Prime のハブ。モータとセンサがつながる。ラズパイの言うとおりに動く</td>
+</tr>
+<tr>
+<td>ラズパイ</td>
+<td>Raspberry Pi。小さな Linux のパソコン。走行体のプログラムが動く</td>
+</tr>
+<tr>
+<td>RasPike-ART</td>
+<td>ラズパイとハブを組み合わせた、ETロボコン公式の環境</td>
+</tr>
+<tr>
+<td>カラーセンサ</td>
+<td>床の明るさや色を見るセンサ</td>
+</tr>
+<tr>
+<td>反射光</td>
+<td>カラーセンサが返す明るさ。0〜100</td>
+</tr>
+<tr>
+<td>超音波センサ</td>
+<td>正面の物までの距離を測るセンサ</td>
+</tr>
+<tr>
+<td>ジャイロ</td>
+<td>何度回ったかが分かるセンサ。ハブに入っている</td>
+</tr>
+<tr>
+<td>フォースセンサ</td>
+<td>押しボタン。スタートに使う</td>
+</tr>
+<tr>
+<td>ストール</td>
+<td>モータが回そうとしているのに回らない状態</td>
+</tr>
+<tr>
+<td>静止摩擦</td>
+<td>小さい出力では車輪が回り出さないこと</td>
+</tr>
+</tbody>
+</table></div>
+<h2>制御</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>言葉</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ライントレース</td>
+<td>床の線をたどって走ること</td>
+</tr>
+<tr>
+<td>縁（エッジ）</td>
+<td>線の端。白と黒の境目。ここをたどる</td>
+</tr>
+<tr>
+<td>目標輝度</td>
+<td>黒と白の真ん中の明るさ。縁の上ならこの明るさになる</td>
+</tr>
+<tr>
+<td>ずれ（偏差）</td>
+<td>目標と今の値の差</td>
+</tr>
+<tr>
+<td>PID制御</td>
+<td>ずれの大きさ（P）、たまり方（I）、変わる速さ（D）から、どれだけ曲がるかを決める方法</td>
+</tr>
+<tr>
+<td>ゲイン</td>
+<td>KP・KI・KD のこと。どれだけ強く効かせるか</td>
+</tr>
+<tr>
+<td>オドメトリ</td>
+<td>車輪の回転から、進んだ距離や自分の位置を計算すること</td>
+</tr>
+<tr>
+<td>状態機械</td>
+<td>今の状態と、何が起きたら次の状態に移るかで動きを決める作り方</td>
+</tr>
+<tr>
+<td>seed（種）</td>
+<td>シミュレータで機体の癖を変えるための番号。同じ番号なら同じ走りになる</td>
+</tr>
+</tbody>
+</table></div>
+<h2>プログラム</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>言葉</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ソース</td>
+<td>人が書いたプログラムの文字のファイル（<code>.c</code> など）</td>
+</tr>
+<tr>
+<td>コンパイル</td>
+<td>ソースを、PCが動かせる形（実行ファイル）に変えること</td>
+</tr>
+<tr>
+<td>コンパイラ</td>
+<td>コンパイルする道具。gcc</td>
+</tr>
+<tr>
+<td>ビルド</td>
+<td>コンパイルなどをして、動かせる形を作ること全体</td>
+</tr>
+<tr>
+<td>警告（warning）</td>
+<td>動くけれど怪しい書き方を教えてくれるもの。チームでは0にする</td>
+</tr>
+<tr>
+<td>変数</td>
+<td>値に名前を付けて覚えておくもの</td>
+</tr>
+<tr>
+<td>関数</td>
+<td>決まった仕事に名前を付けてまとめたもの</td>
+</tr>
+<tr>
+<td>構造体</td>
+<td>関係のある値をまとめて1つにしたもの</td>
+</tr>
+<tr>
+<td>ポインタ</td>
+<td>値そのものではなく、値がある場所</td>
+</tr>
+<tr>
+<td>ヘッダ</td>
+<td><code>.h</code> のファイル。関数の宣言や構造体の形を書く</td>
+</tr>
+<tr>
+<td>make / Makefile</td>
+<td>どのファイルをどう作るかを書いておいて、一言で作る道具とその手順書</td>
+</tr>
+<tr>
+<td>単体テスト</td>
+<td>部品ごとに「こう入れたらこうなるはず」を確かめるプログラム</td>
+</tr>
+<tr>
+<td>シミュレータ</td>
+<td>実機の代わりに、仮想のコースで走らせるプログラム</td>
+</tr>
+<tr>
+<td>ログ</td>
+<td>走行体が走りながら書いた記録</td>
+</tr>
+</tbody>
+</table></div>
+<h2>道具</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>言葉</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ターミナル</td>
+<td>文字でコマンドを打つ画面。Windows では Git Bash を使う</td>
+</tr>
+<tr>
+<td>パス</td>
+<td>ファイルやフォルダの場所の書き方（<code>docs/後輩育成</code> など）</td>
+</tr>
+<tr>
+<td>ssh</td>
+<td>ネットワーク越しに別のコンピュータに入って操作する方法</td>
+</tr>
+<tr>
+<td>IPアドレス</td>
+<td>ネットワーク上の住所</td>
+</tr>
+<tr>
+<td>Git</td>
+<td>ファイルの変更を記録する道具</td>
+</tr>
+<tr>
+<td>GitHub</td>
+<td>Git の記録をインターネット上に置く場所</td>
+</tr>
+<tr>
+<td>コミット</td>
+<td>Git の1回分の記録</td>
+</tr>
+<tr>
+<td>ブランチ</td>
+<td>Git の記録の枝分かれ</td>
+</tr>
+<tr>
+<td>リポジトリ</td>
+<td>Git で管理しているプログラムや資料の置き場所</td>
+</tr>
+<tr>
+<td>draw.io</td>
+<td>モデル図を描く道具</td>
+</tr>
+<tr>
+<td>UML</td>
+<td>モデル図の決まった書き方</td>
+</tr>
+</tbody>
+</table></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

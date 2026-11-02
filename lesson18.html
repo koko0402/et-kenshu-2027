@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第18回 ログを読む・Python で集計する</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="appendix1.html">コマンド早見表</a><a href="appendix2.html">用語集</a><a href="lesson17.html">前の回</a><a href="lesson19.html">次の回</a></nav>
+</div></header>
+<main>
+<h1>第18回 ログを読む・Python で集計する</h1>
+<p>走行体は、走りながら「何を見て、どう判断したか」を1行ずつログに書いています。うまく走らなかったとき、原因を探す手がかりはログしかありません。この回は、ログの読み方と、何本ものログをまとめて比べる Python のスクリプトの書き方をやります。</p>
+<p class="prepare">用意するもの：前の回で持ってきたログ（無ければ練習用のログ）</p>
+<h2>説明</h2>
+<h3>ログの読み方</h3>
+<p>ログには、1秒ごとの状態の行と、判断したときのメッセージの行があります。</p>
+<pre><code>[ 12.0s] 前半走行 入力=カメラ ライン=検出 offset=+0.05 … 位置=(x,y) 走行距離=…
+LAPゲート到達と判断(青線検知)</code></pre>
+<p>1秒ごとの行は <code>[</code> で始まります。第3回でやった <code>grep -v "^\["</code> でこれを除くと、判断のメッセージだけが残って読みやすくなります。</p>
+<p>よく見るメッセージは次のとおりです。<code>ライン逸脱を検知しました</code> は線を見失ったという意味で、直前の offset と場所を見ます。<code>LAPゲート到達と判断(青線検知)</code> は青い線を見て判断した、<code>(オドメトリ距離(保険))</code> が付いていたら、青が見えないまま距離で判断した、という意味です。「見えないまま◯mm進みました」のような行が多い走りは、うまくいっていても危ない走りです。<code>駆動輪のストールが続いたため</code> は、何かに押し付けて車輪が回っていない、という意味です。</p>
+<p>気をつけてほしいのは、ログに書かれているのは「走行体がそう判断した」ことで、本当にそうだったかは分からない、ということです。走行体が「ガレージに着いた」と書いていても、道を間違えて別の場所で止まっていることがあります。</p>
+<h3>Python</h3>
+<p>Python は、C と違ってコンパイルせずにすぐ動かせる言語です。2026年のプログラムでは、カメラの画像処理（<code>src/recognition/vision_server.py</code>）と、補助のスクリプト（<code>scripts/</code>）を Python で書いていました。ログを集計するような、ちょっとした道具を作るのに向いています。</p>
+<pre><code>speed = 70                    # 型は書かなくていい
+if speed &gt; 50:
+    print("速い")             # 行の頭の空白で、if の中だということを表す
+for i in range(3):            # 0, 1, 2
+    print(f"{i + 1}回目")     # f"..." の中の {} に値が入る</code></pre>
+<p>C との大きな違いは、<code>{ }</code> の代わりに行の頭の空白（インデント）で範囲を表すことです。空白の数がそろっていないと <code>IndentationError</code> になります。</p>
+<p>ファイルを1行ずつ読むのは、こう書きます。</p>
+<pre><code>with open("logs/run_20261003_101500.log", encoding="utf-8") as f:
+    for line in f:
+        if "LAPゲート到達" in line:
+            print(line.strip())</code></pre>
+<p>ログを集計するスクリプトは、たいていこの形で書けます。</p>
+<h2>手順</h2>
+<h3>Python を入れる</h3>
+<ol>
+<li>PowerShell で <code>winget install Python.Python.3.13</code> を打つ</li>
+<li>VS Code を開き直して、Git Bash で <code>python --version</code> と打ち、版の番号が出ることを確かめる</li>
+</ol>
+<h3>集計のスクリプトを動かす</h3>
+<ol>
+<li>
+<p>練習のフォルダに入って、動かす</p>
+<pre><code>$ cd ~/Desktop/ETrobo/docs/後輩育成/練習/03_Python
+$ python ログ集計.py</code></pre>
+<p>まだ中身を書いていないので、<code>-</code> や <code>0</code> ばかりの表が出ます</p>
+</li>
+<li>
+<p><code>ログ集計.py</code> を開いて、「ここを書く(1)(2)」を埋める</p>
+</li>
+</ol>
+<h2>演習</h2>
+<h3>演習18-1　集計を完成させる</h3>
+<p><code>ログ集計.py</code> を完成させてください。次の表が出れば完成です。</p>
+<pre><code>ログ                          LAP[秒]   QR ガレージ(本人談)   予定外    最大ずれ
+run_20261003_093000.log          -    8       着いた     1    0.98
+run_20261003_110000.log          -   10       着いた     3    0.98
+run_20261004_101500.log          2    0       着いた     0    0.99</code></pre>
+<p>答えは同じフォルダの <code>答え/ログ集計.py</code> にあります。</p>
+<h3>演習18-2　表を読む</h3>
+<ol>
+<li>上の2本は LAP が <code>-</code> です。なぜでしょう（ログの最初の数行を見る）</li>
+<li><code>run_20261003_110000.log</code> は「ガレージ(本人談)」が「着いた」なのに、第3回の演習3-5では失敗した走行でした。どういうことでしょう</li>
+<li>「最大ずれ」がどれも1に近いのはなぜでしょう</li>
+</ol>
+<details><summary>答え</summary>
+
+1. この2本は難所側の線の上から始める確認用の走り方（`--from-nansho`）なので、前半もLAPも通らない。
+2. ログに書かれるのは走行体がそう判断したことで、本当にガレージの中にいるかは分からない。110000 は道を間違えたまま「ここがガレージのはず」と止まっている。
+3. 線を見失っている間（難所で線の無い所を走っている間）も、最後に見た offset の値が残って出ているため。`ライン=検出` の行だけに絞ると、ボトルの走り（101500）は0.51まで下がる。
+
+</details>
+
+<h3>演習18-3　列を足す</h3>
+<p>次のどれかの列を足してください。ボトルの色（「ボトルの色は黄です」の行から色を取り出す）、最後の行の時刻（何秒で終わったか）、「ライン逸脱を検知」の回数。</p>
+<h3>演習18-4　自分のログで</h3>
+<p>前の回で持ってきた自分のログを <code>python ログ集計.py 自分のログのファイル</code> で集計してください。</p>
+<h2>次回までに</h2>
+<p>次回は、PCの上で本物の走行体のプログラムを仮想のコースで走らせます。</p><div class="pager"><a href="lesson17.html">← 第17回 走行体のプログラムを動かす（実習）</a><a href="lesson19.html">第19回 本物のプログラムを仮想コースで走らせる →</a></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

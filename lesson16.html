@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第16回 ラズパイをつなぐ（実習）</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="appendix1.html">コマンド早見表</a><a href="appendix2.html">用語集</a><a href="lesson15.html">前の回</a><a href="lesson17.html">次の回</a></nav>
+</div></header>
+<main>
+<h1>第16回 ラズパイをつなぐ（実習）</h1>
+<p>ここからは実機です。走行体に載っている Raspberry Pi 4（ラズパイ）は、手のひらくらいの大きさの Linux のパソコンです。何も入っていないラズパイを、PCから操作して走行体のプログラムが動くところまで持っていきます。必ず先輩と一緒にやってください。</p>
+<p class="prepare">用意するもの：Raspberry Pi 4、microSDカード（32GBくらい）とカードリーダー、モバイルバッテリーとUSB-Cケーブル、ラズパイとハブをつなぐUSBケーブル、SPIKE Prime ハブ、USBカメラ</p>
+<h2>説明</h2>
+<h3>何が何につながっているか</h3>
+<pre><code>  PC  ── Wi-Fi（ssh）──  Raspberry Pi 4  ── USBケーブル ──  SPIKE Prime ハブ
+                            │       │                         （モータ・センサ）
+                        USBカメラ  モバイルバッテリー</code></pre>
+<p>プログラムを書くのはPCです。ラズパイには画面もキーボードもつながず、PCから ssh で入って文字で操作します。</p>
+<p>走行体のプログラムはラズパイの上で動きます。カメラの画像から線を探して、どのくらい曲がるかを決めて、ハブに「左を40、右を60で回して」と送ります。ハブには公式の raspike というファームウェアが入っていて、言われたとおりにモータを回し、センサの値を返すだけです。考えるのはラズパイで、ハブは手足です。この組み合わせを RasPike-ART と呼んでいて、ETロボコンの公式の環境です。</p>
+<h3>ラズパイの中</h3>
+<p>ラズパイの中は Linux です。ターミナルのコマンドは、第3回で練習したものがそのまま使えます。ユーザー名は <code>pi</code>、走行体のプログラムは <code>~/etrobo</code>（<code>/home/pi/etrobo</code>）に置きます。</p>
+<p>Linux では、機械もファイルのように見えます。ハブは <code>/dev/ttyACM0</code>、カメラは <code>/dev/video0</code> という名前で見えていて、ここに書いたり読んだりするとハブやカメラとやり取りできます（実際の読み書きは、公式のライブラリがやってくれます）。</p>
+<p>ラズパイでよく使うコマンドは、自分の番号（IPアドレス）を出す <code>hostname -I</code>、SDカードの空きを見る <code>df -h</code>、管理者の権限で動かす <code>sudo</code>、ソフトを入れる <code>sudo apt install 名前</code>、書き込みを今すぐ終わらせる <code>sync</code>、電源を切る準備をする <code>sudo poweroff</code> です。</p>
+<h3>ケーブルと電源</h3>
+<p>ラズパイとハブをつなぐUSBケーブルは、データ通信ができるものでないといけません。充電専用のケーブルだとハブが見えないのですが、見た目では区別できません。通信できたケーブルにはテープで印を付けておいてください。</p>
+<p>ラズパイの電源はモバイルバッテリーです。容量が足りないとラズパイごと落ちることがあります（2026年10月に2回ありました）。</p>
+<h3>2026年に何度も踏んだこと</h3>
+<p>ハブは、走らせ直すたびに電源を完全に切って入れ直します。ハブのメニューを選び直すだけだと前の状態のまま固まっていて、<code>getdevice time out</code> と出て動きません。</p>
+<p>ラズパイの電源を、動いている途中でいきなり抜くと、書いたばかりのファイルが壊れることがあります。ビルドした直後に電源を切って、Makefile やプログラムが0バイトになったことがあります。必ず <code>sudo poweroff</code> で止めてから抜きます。</p>
+<h2>手順</h2>
+<h3>SDカードを作る</h3>
+<ol>
+<li>PCに Raspberry Pi Imager を入れる（公式サイトから）</li>
+<li>デバイスは Raspberry Pi 4、OSは Raspberry Pi OS (64-bit)、ストレージは差したSDカードを選ぶ</li>
+<li>「設定を編集する」で次を入れる。ここを飛ばすと、画面もキーボードも無いラズパイには入れなくなる<ul>
+<li>ホスト名：<code>etrobo</code>（2台目は <code>etrobo2</code> のように台ごとに変える）</li>
+<li>ユーザー名：<code>pi</code>、パスワードはチームで決めているもの</li>
+<li>Wi-Fi：部室のWi-Fiの名前とパスワード、国は JP</li>
+<li>SSH：有効にする</li>
+</ul>
+</li>
+<li>書き込む（5〜10分）。終わったらSDをラズパイに差す</li>
+<li>どの台に何を入れたかを、<code>docs/走行用/</code> のメモに1行残す</li>
+</ol>
+<h3>起動して入る</h3>
+<ol>
+<li>バッテリーをつなぐ。最初の起動は2〜3分かかるので待つ</li>
+<li>
+<p>PCの Git Bash で呼んでみる</p>
+<pre><code>$ ping -c 3 etrobo.local
+64 bytes from 192.168.1.23: icmp_seq=1 ttl=64 time=5.12 ms</code></pre>
+</li>
+<li>
+<p>ssh で入る。最初の1回だけ <code>yes</code> を聞かれる。パスワードは打っても画面に何も出ないが、そのまま打って Enter</p>
+<pre><code>$ ssh pi@etrobo.local
+pi@etrobo:~ $</code></pre>
+<p>行の頭が <code>pi@etrobo</code> になっている間は、ラズパイの中で打っている。PCに戻るときは <code>exit</code></p>
+</li>
+<li>
+<p>公開鍵を登録して、次からパスワード無しで入れるようにする（PC側で1回だけ）</p>
+<pre><code>$ ls ~/.ssh/id_ed25519.pub || ssh-keygen -t ed25519
+$ cat ~/.ssh/id_ed25519.pub | ssh pi@etrobo.local "mkdir -p ~/.ssh &amp;&amp; cat &gt;&gt; ~/.ssh/authorized_keys"</code></pre>
+</li>
+</ol>
+<h3>プログラムを送ってビルドする</h3>
+<ol>
+<li>
+<p>PCの Git Bash で、ETrobo のフォルダから送る。資料以外のプログラム一式がラズパイの <code>~/etrobo</code> に送られ、足りない部品が入って、ラズパイの上でビルドされる（初回は10分以上かかる）</p>
+<pre><code>$ cd ~/Desktop/ETrobo
+$ sh scripts/deploy.sh pi@etrobo.local</code></pre>
+</li>
+</ol>
+<h3>ハブとカメラをつなぐ</h3>
+<ol>
+<li>ハブの電源を入れて、ハブの画面で raspike を選ぶ（∞ の表示になる）</li>
+<li>通信できるUSBケーブルでラズパイとつなぎ、ラズパイの中で <code>ls /dev/ttyACM*</code> と打つ。<code>/dev/ttyACM0</code> が出ればハブが見えている</li>
+<li>カメラをつないで <code>ls /dev/video*</code> と打つ。USBカメラは <code>/dev/video0</code>（video10 より後ろはラズパイの中の部品）</li>
+<li>
+<p>1枚撮る</p>
+<pre><code>pi@etrobo:~ $ cd ~/etrobo
+pi@etrobo:~/etrobo $ make camera SHOT=1</code></pre>
+</li>
+<li>
+<p>PCに持ってきて見る（PCの Git Bash で <code>scp pi@etrobo.local:etrobo/logs/camera_aim.png .</code>）</p>
+</li>
+</ol>
+<h3>動かしてみる</h3>
+<ol>
+<li>
+<p>車輪を浮かせてから点検する</p>
+<pre><code>pi@etrobo:~/etrobo $ make check</code></pre>
+</li>
+<li>
+<p>遅いライントレースだけ走らせる。左右の車輪が両方とも前に回れば大丈夫。止めるときは <code>Ctrl + C</code>、止まらなければハブの電源を切る</p>
+<pre><code>pi@etrobo:~/etrobo $ make start OPT="--line-trace-only --speed 20"</code></pre>
+</li>
+</ol>
+<h3>片付ける</h3>
+<ol>
+<li><code>sync</code> してから <code>sudo poweroff</code>。緑のランプが消えてからバッテリーを抜く</li>
+</ol>
+<h2>うまくいかないとき</h2>
+<p><code>ping</code> で <code>could not find host</code> と出るときは、名前で探せないネットワークです。ルーターの管理画面か <code>arp -a</code> で、ラズパイの番号（IPアドレス）を探して、<code>ssh pi@192.168.x.x</code> のように番号で入ります。3分待っても返事が無いなら、Wi-Fiの名前かパスワードの間違いが多いので、SDを作り直します。</p>
+<p>ping は返るのに ssh だけつながらないことがあります。2026年9月に学校のWi-Fiで起きて、Wi-Fi側で端末どうしの通信を止めていたのが原因でした。スマホのテザリングか、自分たちのルーターを使います。</p>
+<p>SDを作り直したあとに ssh すると、<code>REMOTE HOST IDENTIFICATION HAS CHANGED!</code> と出ます。作り直したのが確かなら、<code>ssh-keygen -R etrobo.local</code> で古い記録を消せば入れます。</p>
+<p><code>/dev/ttyACM0</code> が出ないときは、まずケーブルを疑います。起動してすぐ <code>SPIKE version mismatched!</code> と出て止まるときは、ハブのファームウェアの版とプログラムが合っていないので、<code>make pi SPIKE_VERSION=0.1.1</code> のようにその台に合わせてビルドし直します。</p>
+<p>電源を急に切ってしまったら、次に起動したとき <code>find ~/etrobo -size 0</code> で空のファイルを探して、あれば <code>deploy.sh</code> で送り直します。</p>
+<h2>演習</h2>
+<h3>演習16-1　1台セットアップする</h3>
+<p>手順を最初から最後まで、先輩と一緒に通してやってください。カメラの画像をPCで開けて、<code>make check</code> が通れば終わりです。</p>
+<h3>演習16-2　自分のPCから入る</h3>
+<p>自分のPCに公開鍵を登録して、パスワード無しで <code>ssh pi@etrobo.local</code> で入れるようにしてください。</p>
+<h3>演習16-3　書き足す</h3>
+<p>途中で詰まったことを、この授業の「うまくいかないとき」に書き足してください（<code>授業/16_ラズパイをつなぐ.md</code>）。来年の新人が同じ所で詰まらずに済みます。</p>
+<h2>次回までに</h2>
+<p>次回は、送ったプログラムを実際に走らせます。ラズパイに ssh で入れるようにしておいてください。</p><div class="pager"><a href="lesson15.html">← 第15回 審査で見られるモデル</a><a href="lesson17.html">第17回 走行体のプログラムを動かす（実習） →</a></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>付録 コマンド早見表</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="appendix1.html">コマンド早見表</a><a href="appendix2.html">用語集</a></nav>
+</div></header>
+<main>
+<h1>付録 コマンド早見表</h1>
+<p>印刷して手元に置いておくためのものです。PCは VS Code の Git Bash で <code>ETrobo</code> のフォルダから、ラズパイは <code>ssh pi@etrobo.local</code> で入って <code>cd ~/etrobo</code> してから打ちます。</p>
+<h2>ターミナル（第3回）</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>コマンド</th>
+<th>すること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pwd</code></td>
+<td>今いる場所</td>
+</tr>
+<tr>
+<td><code>ls</code> / <code>ls -l</code></td>
+<td>中身の一覧 / 大きさと日時も</td>
+</tr>
+<tr>
+<td><code>cd 場所</code> / <code>cd ..</code></td>
+<td>移動 / 1つ上へ</td>
+</tr>
+<tr>
+<td><code>cat</code> / <code>less</code></td>
+<td>中身を見る（less は <code>q</code> で終わる）</td>
+</tr>
+<tr>
+<td><code>head -n 10</code> / <code>tail -n 5</code></td>
+<td>最初の10行 / 最後の5行</td>
+</tr>
+<tr>
+<td><code>tail -f ファイル</code></td>
+<td>増えていく行を見続ける（<code>Ctrl + C</code> で終わる）</td>
+</tr>
+<tr>
+<td><code>grep 文字 ファイル</code></td>
+<td>文字を含む行（<code>-n</code> 行番号、<code>-c</code> 数、<code>-v</code> 含まない行）</td>
+</tr>
+<tr>
+<td><code>mkdir -p 名前</code></td>
+<td>フォルダを作る</td>
+</tr>
+<tr>
+<td><code>cp</code> / <code>mv</code> / <code>rm</code></td>
+<td>写す / 動かす・名前を変える / 消す（戻せない）</td>
+</tr>
+<tr>
+<td><code>Tab</code> / <code>↑</code> / <code>Ctrl + C</code></td>
+<td>名前を補う / 前のコマンド / 止める</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Git（第4回）</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>コマンド</th>
+<th>すること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>git status</code></td>
+<td>変えたファイルの一覧</td>
+</tr>
+<tr>
+<td><code>git diff</code></td>
+<td>何をどう変えたか</td>
+</tr>
+<tr>
+<td><code>git restore ファイル</code></td>
+<td>最後に記録した状態に戻す（今の変更は消える）</td>
+</tr>
+<tr>
+<td><code>git add</code> / <code>git commit -m "説明"</code></td>
+<td>記録に入れる / 記録する</td>
+</tr>
+<tr>
+<td><code>git pull</code> / <code>git push</code></td>
+<td>取ってくる / 送る</td>
+</tr>
+</tbody>
+</table></div>
+<h2>C言語（第5〜9回）</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>コマンド</th>
+<th>すること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gcc -Wall -o hello hello.c</code></td>
+<td>hello.c から hello を作る（<code>-lm</code> は数学の関数を使うとき）</td>
+</tr>
+<tr>
+<td><code>./hello</code></td>
+<td>作ったものを動かす</td>
+</tr>
+<tr>
+<td><code>mingw32-make</code></td>
+<td>Makefile のとおりに作る（ラズパイでは <code>make</code>）</td>
+</tr>
+<tr>
+<td><code>sh check.sh 1</code></td>
+<td>ドリルの問題1を採点（<code>sh check.sh</code> で全部）</td>
+</tr>
+</tbody>
+</table></div>
+<h2>練習用シミュレータ（第11・12回）</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>コマンド</th>
+<th>すること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mingw32-make</code></td>
+<td>my_robot.c で作って走らせる。result.html で再生</td>
+</tr>
+<tr>
+<td><code>./entry_sim --seed 3 --quiet</code></td>
+<td>機体の癖を変えて、結果だけ</td>
+</tr>
+<tr>
+<td><code>mingw32-make answer</code></td>
+<td>答えの例で走らせる</td>
+</tr>
+</tbody>
+</table></div>
+<h2>走行体（第16・17回）</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>場所</th>
+<th>コマンド</th>
+<th>すること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PC</td>
+<td><code>ssh pi@etrobo.local</code></td>
+<td>ラズパイに入る（<code>exit</code> で出る）</td>
+</tr>
+<tr>
+<td>PC</td>
+<td><code>sh scripts/deploy.sh pi@etrobo.local</code></td>
+<td>送ってビルド。「== 完了。」が出れば成功</td>
+</tr>
+<tr>
+<td>PC</td>
+<td><code>scp pi@etrobo.local:etrobo/logs/run_*.log .</code></td>
+<td>ログを持ってくる</td>
+</tr>
+<tr>
+<td>ラズパイ</td>
+<td><code>ls /dev/ttyACM* /dev/video*</code></td>
+<td>ハブとカメラが見えているか</td>
+</tr>
+<tr>
+<td>ラズパイ</td>
+<td><code>make camera SHOT=1</code></td>
+<td>カメラの向きを確かめる</td>
+</tr>
+<tr>
+<td>ラズパイ</td>
+<td><code>make check</code></td>
+<td>点検（車輪を浮かせて）</td>
+</tr>
+<tr>
+<td>ラズパイ</td>
+<td><code>make start OPT="--line-trace-only --speed 20"</code></td>
+<td>走らせる（打つ前にハブの電源を入れ直す）</td>
+</tr>
+<tr>
+<td>ラズパイ</td>
+<td><code>pgrep -af "[e]trobo /dev\|[v]ision_server"</code></td>
+<td>前の走りが残っていないか</td>
+</tr>
+<tr>
+<td>ラズパイ</td>
+<td><code>sync</code> → <code>sudo poweroff</code></td>
+<td>片付け。ランプが消えてから抜く</td>
+</tr>
+</tbody>
+</table></div>
+<h2>本物のプログラムをPCで（第19回）</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>コマンド</th>
+<th>すること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sh scripts/local_test.sh</code></td>
+<td>単体テスト（全部 OK になってから送る）</td>
+</tr>
+<tr>
+<td><code>mingw32-make build/rally_sim</code></td>
+<td>シミュレータを作る</td>
+</tr>
+<tr>
+<td><code>python scripts/sim_view.py --bottles --seed 3</code></td>
+<td>1回走らせて logs/sim_view_bottles.html で再生</td>
+</tr>
+</tbody>
+</table></div>
+<h2>困ったとき</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>出たもの</th>
+<th>すること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>No such file or directory</code></td>
+<td>名前の打ち間違いか、場所が違う。<code>pwd</code> と <code>ls</code></td>
+</tr>
+<tr>
+<td><code>command not found</code></td>
+<td>つづりを確かめる。入っていなければ入れる</td>
+</tr>
+<tr>
+<td>何も出ずに止まった</td>
+<td><code>Ctrl + C</code></td>
+</tr>
+<tr>
+<td><code>getdevice time out</code></td>
+<td>ハブの電源を切って5秒待って入れ直す</td>
+</tr>
+<tr>
+<td><code>SPIKE version mismatched!</code></td>
+<td><code>make pi SPIKE_VERSION=0.1.1</code> のように台に合わせる</td>
+</tr>
+<tr>
+<td>ssh がつながらない</td>
+<td>同じ Wi-Fi か。番号が変わっていないか</td>
+</tr>
+<tr>
+<td>走行体がずれて危ない</td>
+<td>ハブの電源を切る</td>
+</tr>
+</tbody>
+</table></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

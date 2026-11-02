@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第19回 本物のプログラムを仮想コースで走らせる</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="appendix1.html">コマンド早見表</a><a href="appendix2.html">用語集</a><a href="lesson18.html">前の回</a><a href="lesson20.html">次の回</a></nav>
+</div></header>
+<main>
+<h1>第19回 本物のプログラムを仮想コースで走らせる</h1>
+<p>第11回・第12回のシミュレータは、練習用に自分で書いたプログラムを走らせるものでした。この回は、2026年の本物の走行体のプログラムを、PCの上で動かします。ハブとカメラだけを偽物に差し替えて、判断はすべて実機と同じプログラムでします。実機が無くても、走りの組み立てが崩れていないかを何百回でも確かめられます。</p>
+<p class="prepare">用意するもの：第18回で Python を入れたPC</p>
+<h2>説明</h2>
+<h3>単体テスト</h3>
+<p>走行体のプログラムのうち、機械にさわらない部分（PID の計算、起動オプションの読み取り、ETラリーの道順の計画など）は、PCだけで確かめられます。<code>test/test_*.c</code> に、「この値を入れたらこうなるはず」という確認を書いてあります。これを単体テストといいます。</p>
+<pre><code>assert(delivery_math_color_from_hsv(5, 80, 55) == DELIVERY_BOTTLE_RED);</code></pre>
+<p><code>assert(式)</code> は「この式が正しいはず」という確認で、正しくなければ、その行で止まって式とファイル名と行番号を出します。テストが落ちたら、テストが間違っているのか、プログラムが間違っているのかを考えて、正しいほうに合わせます。テストを消して OK にするのは、直したことになりません。</p>
+<p>ドリルの <code>check.sh</code> も、同じしくみで作ってあります。</p>
+<h3>シミュレータ</h3>
+<p><code>test/simulator/</code> に、ハブとカメラの偽物があります。モータへの指示を受けて仮想の走行体を動かし、センサの値を返します。走行体のプログラム（<code>src/app.c</code> など）はそのまま使うので、実機と同じ判断をします。時間は待たないので、120秒の走りが1秒もかからずに終わります。</p>
+<p>seed（種）を変えると、滑り、左右の差、回る量、ジャイロの遅れ、QRの読みにくさがばらつきます。同じ seed なら毎回同じ走りになるので、失敗した seed を何度でも再現できます。</p>
+<p>シミュレータは実機の代わりにはなりません。道順と、失敗したときの立て直しが崩れていないかを確かめる道具です。実機で起きたことはシミュレータにも入れておくと、次から自動で確かめられます。</p>
+<h2>手順</h2>
+<ol>
+<li>
+<p>ETrobo のフォルダで、単体テストを走らせる</p>
+<pre><code>$ cd ~/Desktop/ETrobo
+$ sh scripts/local_test.sh</code></pre>
+<p>最後まで <code>OK   test_…</code> が並べば、全部通っています</p>
+</li>
+<li>
+<p>シミュレータをビルドする</p>
+<pre><code>$ mingw32-make build/rally_sim</code></pre>
+</li>
+<li>
+<p>1回走らせて、ブラウザで再生する</p>
+<pre><code>$ python scripts/sim_view.py --bottles --seed 3</code></pre>
+<p><code>logs/sim_view_bottles.html</code> をダブルクリックして、▶ で再生します。右のメッセージは、実機のログと同じものです</p>
+</li>
+</ol>
+<h2>演習</h2>
+<h3>演習19-1　テストを落としてみる</h3>
+<p><code>test/test_delivery_math.c</code> の確認を1つ、わざと違う色に書き換えて、<code>sh scripts/local_test.sh</code> を走らせてください。何と出ましたか。読んで、どの行の何がおかしいと言っているか説明してください。終わったら <code>git restore test/test_delivery_math.c</code> で戻します。</p>
+<h3>演習19-2　走りを見る</h3>
+<p>演習の手順3で再生した走りについて答えてください。</p>
+<ol>
+<li>ボトルの色は何色でしたか。何で判定しましたか</li>
+<li>南東の角で何をしていますか</li>
+<li>力士ボトルはどうやって見つけましたか</li>
+</ol>
+<details><summary>答え</summary>
+
+1. メッセージの「ボトルの色は黄です」など。アームを上げて前を向けたカラーセンサと、近づく間のカメラの両方で数えている。
+2. 線が直角に北へ折れていて、縁をたどるだけでは曲がり切れないので、線が切れた所で止まり、少し下がってジャイロで北を向いている。
+3. 土俵の東で、左右に回りながら超音波センサの距離を見て、いちばん近い物の向きを探している。
+
+</details>
+
+<h3>演習19-3　seed を変える</h3>
+<p><code>--seed</code> を1〜10で変えて走らせてください。全部同じ動きにならないのはなぜでしょう。</p>
+<h3>演習19-4　100回まとめて</h3>
+<pre><code>$ sh scripts/rally_sim.sh ./build/rally_sim.exe 100 1 -- --from-main --bottles --no-calibration</code></pre>
+<p>成功率と、かかった時間が出ます。失敗した回があれば、<code>logs/rally_sim/run_&lt;seed&gt;.txt</code> を <code>grep -v "^\["</code> で読んで原因を探してください。</p>
+<p>回数を書き忘れると「試行 0 回」と出ます。成功率0％ではなく、走っていないだけなので慌てないでください。</p>
+<h3>演習19-5　速さを変えて比べる</h3>
+<p><code>config/parameters.h</code> の <code>DELIVERY_CARRY_SPEED</code>（ボトルを抱えて線をたどる速さ、今は30）を25と35に変えて、それぞれ演習19-4を走らせてください（変えたらビルドし直す）。遅いほうが確実そうなのに、25で成功率が下がるのはなぜでしょう。</p>
+<p>終わったら必ず30に戻してください（<code>git diff config/parameters.h</code> で確かめる）。</p>
+<details><summary>答え</summary>
+
+2026年10月の結果では、25が100回中70回、30が300回中299回、35が75回だった。25だと左右の出力が、車輪が回り出すぎりぎり（静止摩擦）に近くなって、曲がる側の車輪が止まってしまう。遅いほど安全とは限らない。
+
+</details>
+
+<h2>次回までに</h2>
+<p>次回は、このプログラムに自分で機能を足すときの手順をやります。</p><div class="pager"><a href="lesson18.html">← 第18回 ログを読む・Python で集計する</a><a href="lesson20.html">第20回 機能を足すときの手順 →</a></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

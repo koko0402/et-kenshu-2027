@@ -3,102 +3,181 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>第3回 C言語（1）変数・条件・繰り返し</title>
+<title>第3回 ターミナルに慣れる</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="site"><div class="inner">
 <a class="title" href="index.html">ETロボコン 新人研修 2027</a>
-<nav><a href="index.html">授業一覧</a><a href="lesson02.html">前の回</a><a href="lesson04.html">次の回</a></nav>
+<nav><a href="index.html">授業一覧</a><a href="appendix1.html">コマンド早見表</a><a href="appendix2.html">用語集</a><a href="lesson02.html">前の回</a><a href="lesson04.html">次の回</a></nav>
 </div></header>
 <main>
-<h1>第3回 C言語（1）変数・条件・繰り返し</h1>
-<p>C言語の基本を、走行体で使う計算を題材に練習します。この回でドリルの問題1〜4をやります。</p>
+<h1>第3回 ターミナルに慣れる</h1>
+<p>ETロボコンの開発では、マウスでクリックするより、ターミナルで文字のコマンドを打つ場面のほうがずっと多くなります。走行体のラズパイには画面をつながずに、PCから文字だけで操作するからです。この回は、ずっと使うコマンドを手で打って覚えます。</p>
 <p class="prepare">用意するもの：第2回で準備したPC</p>
 <h2>説明</h2>
-<h3>ドリルのしくみ</h3>
-<p><code>ドリル/</code> の中に <code>q01_distance.c</code> から <code>q12_logline.c</code> まで12個のファイルがあります。ファイルの先頭のコメントが問題文で、<code>/* ここに書く */</code> の所を書き換えて関数を完成させます。関数の名前や引数は変えないでください。</p>
-<p>書いたら <code>sh check.sh 1</code> のように問題の番号を付けて採点します。</p>
-<pre><code>$ sh check.sh 1
-問題1  距離から車輪の角度へ（変数と計算）
-  × 314.159mm → 360度  → 0.000 になった（正しくは 360.000）
-  ○ 0mm → 0度
-  ...
-  1 / 4</code></pre>
-<p>× の行には、何を入れたら何が返ってきて、本当は何が正しいかが出ます。</p>
-<h3>変数と型</h3>
-<pre><code>int   reflect = 47;        /* 整数 */
-float distance = 314.2f;   /* 小数。f を付けると float */</code></pre>
-<p>気をつけてほしいのは、int どうしの割り算は小数が切り捨てられることです。<code>3 / 2</code> は 1 になります。小数で計算したいときは、どちらかを <code>(float)3 / 2</code> のように float にします。</p>
-<p>決まった数字は、<code>#define</code> で名前を付けてから使います。</p>
-<pre><code>#define WHEEL_RADIUS_MM 50.0f</code></pre>
-<p>プログラムの中に <code>50.0f</code> と直接書くと、あとで何の数字か分からなくなるからです。2026年のプログラムでは、こういう数字を全部 <code>config/parameters.h</code> に集めていました。</p>
-<h3>条件と繰り返し</h3>
-<pre><code>if (reflect &lt; 20) {
-    /* 黒 */
-} else if (reflect &gt; 70) {
-    /* 白 */
-} else {
-    /* その間 */
-}
-
-for (int i = 0; i &lt; n; i++) {
-    sum += values[i];      /* values[0] から values[n-1] まで */
-}</code></pre>
-<h3>値を2つ返したいとき</h3>
-<p>関数は <code>return</code> で値を1つしか返せません。2つ返したいときは、書き込む先の場所（ポインタ）を受け取ります。</p>
-<pre><code>void find_min_max(const int values[], int n, int *min, int *max)
-{
-    *min = values[0];      /* min が指している場所に書く */
-    ...
-}
-
-int lo, hi;
-find_min_max(data, 6, &amp;lo, &amp;hi);   /* lo と hi の場所を渡す */</code></pre>
-<p><code>*</code> と <code>&amp;</code> は最初は混乱しますが、<code>&amp;lo</code> が「lo の場所」、関数の中の <code>*min</code> が「その場所の中身」と読めば大丈夫です。</p>
+<h3>行の頭の読み方</h3>
+<p>VS Code の下に Git Bash を出すと、こんな行が出ています。</p>
+<pre><code>taro@PC MINGW64 ~/Desktop/ETrobo (main)
+$</code></pre>
+<p><code>taro@PC</code> は誰がどのPCを使っているか、<code>~/Desktop/ETrobo</code> は今いるフォルダ、<code>(main)</code> は Git のブランチの名前（第4回）です。<code>$</code> は「ここに打ってください」という印です。この資料でも、コマンドの前に <code>$</code> を書いていますが、<code>$</code> 自体は打ちません。</p>
+<p>ターミナルは、いつもどこか1つのフォルダに「いて」、打ったコマンドはそのフォルダで動きます。今どこにいるかを意識するのが、いちばん大事です。</p>
+<h3>場所の書き方（パス）</h3>
+<p>フォルダの場所は <code>/</code> で区切って書きます。これをパスといいます。</p>
+<p><code>~</code> は自分のホームフォルダ、<code>.</code> は今いるフォルダ、<code>..</code> は1つ上のフォルダです。<code>docs/後輩育成</code> のように書くと「今いる場所の中の docs の中の 後輩育成」という意味になります。名前に空白が入っているときは <code>"docs/手がかり/公式 資料"</code> のように <code>"</code> で囲みます。</p>
+<h3>よく使うコマンド</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>コマンド</th>
+<th>すること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pwd</code></td>
+<td>今いるフォルダを表示</td>
+</tr>
+<tr>
+<td><code>ls</code></td>
+<td>フォルダの中身を一覧（<code>ls -l</code> で大きさと日時も）</td>
+</tr>
+<tr>
+<td><code>cd フォルダ</code></td>
+<td>そのフォルダに移動（<code>cd ..</code> で1つ上、<code>cd</code> だけでホームへ）</td>
+</tr>
+<tr>
+<td><code>cat ファイル</code></td>
+<td>ファイルの中身を全部表示</td>
+</tr>
+<tr>
+<td><code>head -n 10 ファイル</code></td>
+<td>最初の10行</td>
+</tr>
+<tr>
+<td><code>tail -n 5 ファイル</code></td>
+<td>最後の5行</td>
+</tr>
+<tr>
+<td><code>less ファイル</code></td>
+<td>1画面ずつ表示（<code>q</code> で終わる、<code>/文字</code> で探す）</td>
+</tr>
+<tr>
+<td><code>grep 文字 ファイル</code></td>
+<td>その文字を含む行だけ表示（<code>-n</code> で行番号、<code>-c</code> で数、<code>-v</code> で含まない行）</td>
+</tr>
+<tr>
+<td><code>mkdir -p フォルダ</code></td>
+<td>フォルダを作る</td>
+</tr>
+<tr>
+<td><code>cp 元 先</code></td>
+<td>写す</td>
+</tr>
+<tr>
+<td><code>mv 元 先</code></td>
+<td>動かす、名前を変える</td>
+</tr>
+<tr>
+<td><code>rm ファイル</code></td>
+<td>消す。ゴミ箱には入らず、戻せない</td>
+</tr>
+</tbody>
+</table></div>
+<p>コマンドの出力は、<code>|</code>（パイプ）で次のコマンドに渡せます。<code>grep -v "^\[" ログ | tail -n 15</code> は「<code>[</code> で始まらない行のうち、最後の15行」です。<code>&gt;</code> を使うと、出力をファイルに保存できます。</p>
+<h3>覚えておくキー</h3>
+<p><code>Tab</code> は、ファイル名やフォルダ名の続きを補ってくれます。日本語の名前も、最初の1文字を打って <code>Tab</code> を押せば補えます。打ち間違いが減るので、どんどん使ってください。</p>
+<p><code>↑</code> で前に打ったコマンドが出てきます。<code>Ctrl + C</code> は、動いているものを止めます。何も出ずに止まったように見えるときは、だいたいこれで戻れます。</p>
+<h3>エラーの読み方</h3>
+<p>コマンドが失敗すると英語のエラーが出ますが、1行目を読めばだいたい原因が書いてあります。</p>
+<p><code>No such file or directory</code> は「そんなファイルやフォルダは無い」です。名前の打ち間違いか、今いる場所が違います。<code>ls</code> と <code>pwd</code> で確かめます。<code>command not found</code> は「そんなコマンドは無い」で、つづりの間違いが多いです。<code>Permission denied</code> は「権限が無い」です。</p>
+<p><code>grep LAP</code> のようにファイル名を付け忘れると、何も出ずに止まったままになります。キーボードからの入力を待っている状態なので、<code>Ctrl + C</code> で止めます。</p>
+<h3>取り返しがつかないこと</h3>
+<p><code>rm</code> で消したものは戻せません。<code>rm -r フォルダ</code> はフォルダごと消えます。大会の走行ログもこれで消えます。消す前に必ず <code>ls</code> で中身を確かめてください。</p>
+<p><code>&gt;</code> は中身を上書きします。ファイルの最後に足すつもりなら <code>&gt;&gt;</code> です。<code>&gt;</code> と間違えると、前の中身が消えます。</p>
 <h2>手順</h2>
+<p>練習用のデータを使います。中身は壊しても大丈夫です（壊したら <code>git restore docs/後輩育成/練習</code> で元に戻せます）。</p>
 <ol>
-<li>VS Code で <code>ドリル/q01_distance.c</code> を開く</li>
-<li>先頭のコメントを読んで、<code>/* ここに書く */</code> の所を書く</li>
-<li>ターミナルで <code>cd docs/後輩育成/新人研修2027/ドリル</code> して、<code>sh check.sh 1</code> で採点する</li>
-<li>× があれば直して、もう一度採点する。全部 ○ になったら次の問題へ</li>
+<li>
+<p>VS Code で Git Bash を出して、練習用のフォルダに移動する</p>
+<pre><code>$ cd ~/Desktop/ETrobo/docs/後輩育成/練習/01_ターミナル/練習用データ</code></pre>
+<p><code>cd ~/De</code> まで打って <code>Tab</code> を押すと続きが出てきます</p>
+</li>
+<li>
+<p><code>pwd</code> と <code>ls</code> を打って、今どこにいて、中に何があるかを見る</p>
+</li>
+<li>演習をやる</li>
 </ol>
-<p>コンパイルできないときは、<code>q01_distance.c:8:5: error: expected ';'</code> のように、ファイル名と行番号が出ます。いちばん上の error だけを見て、その行かひとつ上の行を直してください。下に続くエラーは最初のエラーにつられて出ていることが多いので、1つ直したら採点し直したほうが早いです。</p>
 <h2>演習</h2>
-<h3>演習3-1　距離から車輪の角度へ（問題1）</h3>
-<p>走行体を進めたい距離から、車輪（半径50mm）を何度回せばいいかを返す関数を書きます。</p>
-<details><summary>ヒント</summary>
+<h3>演習3-1　場所と中身</h3>
+<ol>
+<li><code>メモ/2026年/9月</code> に入って、中のファイルを一覧にし、<code>0912_試走会.txt</code> の中身を表示してください</li>
+<li>1つ上（<code>2026年</code>）に戻ってください。さらに一気に <code>練習用データ</code> まで戻ってください</li>
+</ol>
+<details><summary>答え</summary>
 
-車輪が1回転（360度）すると、円周（2 × π × 50mm）だけ進む。後ろに進むとき（距離がマイナス）も、同じ式でそのまま角度がマイナスになる。
-
-</details>
-
-<h3>演習3-2　明るさで場所を分ける（問題2）</h3>
-<p>カラーセンサの反射光から、黒・線の縁・白のどれを見ているかを返します。</p>
-<details><summary>ヒント</summary>
-
-「20より小さい」は `reflect < 20` なので、20ちょうどは黒に入らない。20と21で動きが変わる所は、実際のプログラムでもバグが出やすいので、テストにも入れてある。
-
-</details>
-
-<h3>演習3-3　平均を出す（問題3）</h3>
-<p>キャリブレーションで読んだ値の平均を返します。</p>
-<details><summary>ヒント</summary>
-
-int どうしの割り算になっていないか確かめる。n が0のときに0で割らないようにする。
+<pre><code>$ cd メモ/2026年/9月
+$ ls
+$ cat 0912_試走会.txt
+$ cd ..
+$ cd ../..</code></pre>
 
 </details>
 
-<h3>演習3-4　いちばん暗い・明るい値を探す（問題4）</h3>
-<p>配列の中のいちばん小さい値と大きい値を、ポインタで2つ返します。</p>
-<details><summary>ヒント</summary>
+<h3>演習3-2　ログを見る</h3>
+<p><code>logs</code> の中には、走行体が走ったときの記録（ログ）が3本入っています。</p>
+<ol>
+<li><code>logs/run_20261004_101500.log</code> の最初の10行と、最後の5行を表示してください。最後の行は何ですか</li>
+<li>同じファイルを <code>less</code> で開いて、<code>/LAP</code> で「LAP」を探してください（<code>n</code> で次、<code>q</code> で終わる）</li>
+</ol>
+<details><summary>答え</summary>
 
-最初の値を「今までで一番小さい（大きい）」として入れておいて、2番目から順に比べていく。
+`head -n 10 logs/run_20261004_101500.log`、`tail -n 5 logs/run_20261004_101500.log`。最後の行が「競技終了。」なら最後まで走ったということです。途中で切れていたら、そこで止まった（固まった、電源が切れた、Ctrl+C で止めた）ということです。
 
 </details>
 
+<h3>演習3-3　grep で探す</h3>
+<ol>
+<li><code>run_20261004_101500.log</code> から「ボトルの色」を含む行を出してください。ボトルは何色でしたか</li>
+<li>3本のログ全部から「LAP」を含む行を、行番号つきで出してください（ファイル名に <code>logs/*.log</code> と書くと全部が対象になる）</li>
+<li><code>[</code> で始まる行（1秒ごとの状態の行）以外を出してください。ログが一気に読みやすくなります</li>
+</ol>
+<details><summary>答え</summary>
+
+<pre><code>$ grep "ボトルの色" logs/run_20261004_101500.log
+$ grep -n "LAP" logs/*.log
+$ grep -v "^\[" logs/run_20261004_101500.log</code></pre>
+
+`^` は「行の頭」という意味です。`[` は特別な記号なので、前に `\` を付けて普通の文字として扱います。
+
+</details>
+
+<h3>演習3-4　作る・写す・消す</h3>
+<ol>
+<li><code>メモ/2026年/11月</code> を作ってください</li>
+<li><code>メモ/2026年/10月/1002_実機.txt</code> を <code>11月</code> へ写して、名前を <code>1105_実機.txt</code> に変えてください</li>
+<li><code>11月</code> のフォルダをまるごと消してください。消す前に <code>ls</code> で中身を確かめること</li>
+</ol>
+<details><summary>答え</summary>
+
+<pre><code>$ mkdir -p メモ/2026年/11月
+$ cp メモ/2026年/10月/1002_実機.txt メモ/2026年/11月/
+$ mv メモ/2026年/11月/1002_実機.txt メモ/2026年/11月/1105_実機.txt
+$ ls メモ/2026年/11月
+$ rm -r メモ/2026年/11月</code></pre>
+
+</details>
+
+<h3>演習3-5　ログから原因を探す</h3>
+<p><code>run_20261003_110000.log</code> は、ガレージの外で止まってしまった走行の記録です（シミュレータで作ったもの）。</p>
+<ol>
+<li>演習3-3の3のやり方で、メッセージだけを読んでください</li>
+<li>「ETラリーの手順を終えました」より後で、予定どおりにいかなかったことを書いている行を2つ探してください</li>
+<li>どこから狂ったと思いますか。一言で書いてください</li>
+</ol>
+<p>もっと詳しい答えは <code>docs/後輩育成/練習/01_ターミナル/答え.md</code> にあります。自分でやってから見てください。</p>
 <h2>次回までに</h2>
-<p>4問とも ○ にしておいてください。時間があれば、<code>ドリル/answer/</code> の答えと自分のを見比べてみてください。採点が通っていれば、書き方が違っていても間違いではありません。どちらが読みやすいかを考えてみてください。</p><div class="pager"><a href="lesson02.html">← 第2回 開発環境とターミナル</a><a href="lesson04.html">第4回 C言語（2）関数・構造体 →</a></div>
+<p>コマンドの一覧は付録の「コマンド早見表」にもまとめてあります。印刷して手元に置いておくと便利です。</p><div class="pager"><a href="lesson02.html">← 第2回 パソコンの準備</a><a href="lesson04.html">第4回 Git で記録する →</a></div>
 </main>
 <footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
 </body>

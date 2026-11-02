@@ -3,88 +3,94 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>第2回 開発環境とターミナル</title>
+<title>第2回 パソコンの準備</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="site"><div class="inner">
 <a class="title" href="index.html">ETロボコン 新人研修 2027</a>
-<nav><a href="index.html">授業一覧</a><a href="lesson01.html">前の回</a><a href="lesson03.html">次の回</a></nav>
+<nav><a href="index.html">授業一覧</a><a href="appendix1.html">コマンド早見表</a><a href="appendix2.html">用語集</a><a href="lesson01.html">前の回</a><a href="lesson03.html">次の回</a></nav>
 </div></header>
 <main>
-<h1>第2回 開発環境とターミナル</h1>
-<p>自分のPCで、Cのプログラムを書いてコンパイルして動かせるようにします。後半は、これからずっと使うターミナルの基本を練習します。</p>
-<p class="prepare">用意するもの：自分のPC（Windows）、GitHub のアカウント</p>
+<h1>第2回 パソコンの準備</h1>
+<p>プログラムを書いて動かすための道具を、自分のPCに入れます。その前に、ファイルとフォルダの話を少しします。ここがあいまいだと、このあと何度もつまずくからです。</p>
+<p class="prepare">用意するもの：自分のPC（Windows）、GitHub のアカウント（無ければこの回で作る）</p>
 <h2>説明</h2>
-<p>ETロボコンの開発では、マウスでクリックするより、ターミナルで文字のコマンドを打つ場面のほうがずっと多くなります。ラズパイには画面をつながずに、PCから文字だけで操作するからです。</p>
-<p>Windows では、ターミナルとして Git Bash を使います。Git for Windows と一緒に入るもので、ラズパイ（Linux）と同じ書き方でコマンドが打てます。Windows に最初から入っている PowerShell は書き方が少し違うので、この研修では使いません。</p>
-<p>Cのコンパイラは gcc を使います。Windows では WinLibs というパッケージに gcc と mingw32-make（make の Windows 版）が一緒に入っています。</p>
-<p>エディタは VS Code です。VS Code の下のほうにターミナルを出せるので、ファイルを書く画面とコマンドを打つ画面を1つの窓で使えます。</p>
-<p>プログラムや資料は GitHub の非公開リポジトリに置いています。先輩に招待してもらってから取ってきます。</p>
+<h3>ファイルとフォルダ</h3>
+<p>PCの中のものは、全部「ファイル」です。写真も、Wordの文書も、これから書くプログラムもファイルです。ファイルは「フォルダ」の中に入っていて、フォルダの中にさらにフォルダを入れられます。</p>
+<p>ファイルの名前の最後の <code>.</code> から後ろを「拡張子」といって、何のファイルかを表しています。<code>hello.c</code> ならC言語のプログラム、<code>README.md</code> なら Markdown という書き方の文章、<code>index.html</code> ならWebページです。</p>
+<p>Windows は最初、拡張子を隠しています。プログラムを書くときは見えないと困るので、表示するようにします（手順の1）。</p>
+<h3>プログラムを書いて動かすまで</h3>
+<p>C言語のプログラムは、人が読める文字で書いた「ソース」を、コンパイラという道具でPCが動かせる形（実行ファイル）に変えてから動かします。この変換を「コンパイル」といいます。ETロボコンでは gcc というコンパイラを使います。</p>
+<p>ソースを書くのにはエディタを使います。メモ帳でも書けますが、VS Code を使うと、色分けしてくれたり、間違いを教えてくれたりします。</p>
+<p>コンパイラを動かしたり、作ったプログラムを動かしたりするのは「ターミナル」という、文字でコマンドを打つ画面です。Windows では Git Bash というターミナルを使います。ターミナルは次の回でじっくり練習します。</p>
+<h3>入れるもの</h3>
+<p>この回で入れるのは次の3つです。</p>
+<ul>
+<li>Git for Windows … Git（プログラムの変更を記録する道具、第4回）と、ターミナルの Git Bash が入る</li>
+<li>VS Code … エディタ</li>
+<li>WinLibs … gcc（Cのコンパイラ）と mingw32-make（make の Windows 版、第9回）が入る</li>
+</ul>
+<p>Python も使いますが、第18回で入れます。</p>
 <h2>手順</h2>
-<h3>入れる</h3>
+<h3>拡張子を表示する</h3>
+<ol>
+<li>エクスプローラー（フォルダの黄色いアイコン）を開く</li>
+<li>上の「表示」→「表示」→「ファイル名拡張子」にチェックを入れる</li>
+</ol>
+<h3>道具を入れる</h3>
 <ol>
 <li>
-<p>スタートメニューで「PowerShell」を開き、次の3行を1行ずつ打つ（終わるまで数分かかる）</p>
+<p>スタートメニューで「PowerShell」と打って開き、次の3行を1行ずつ打って Enter を押す（終わるまで数分かかる。途中で「はい」を聞かれたら「はい」）</p>
 <pre><code>winget install Git.Git
 winget install Microsoft.VisualStudioCode
 winget install BrechtSanders.WinLibs.POSIX.UCRT</code></pre>
 </li>
 <li>
-<p>PowerShell を閉じて、VS Code を開く</p>
+<p>PowerShell を閉じる。PCを一度再起動しておくと確実</p>
 </li>
-<li>VS Code の上のメニューで「ターミナル」→「新しいターミナル」を開き、右上の <code>+</code> の横の <code>∨</code> から「Git Bash」を選ぶ</li>
+</ol>
+<h3>VS Code の準備</h3>
+<ol>
+<li>VS Code を開く</li>
+<li>左のアイコンの並びにある「拡張機能」（四角が4つのアイコン）を押し、「Japanese Language Pack」を探して入れる。右下に出る「再起動」を押すと日本語になる</li>
+<li>同じように「C/C++」（Microsoft のもの）と「Draw.io Integration」も入れておく</li>
+<li>上のメニューの「ターミナル」→「新しいターミナル」を押す。下に黒っぽい画面が出る</li>
+<li>その右上の <code>+</code> の横の <code>∨</code> を押して「Git Bash」を選ぶ。行の最後が <code>$</code> になっていれば Git Bash</li>
 <li>
-<p>次のように打って、3つとも版の番号が出ることを確かめる</p>
+<p>次のように打って、3つとも版の番号が出ることを確かめる（<code>$</code> は打たない。打つのはその後ろだけ）</p>
 <pre><code>$ gcc --version
 $ mingw32-make --version
 $ git --version</code></pre>
-<p><code>command not found</code> と出るものがあったら、VS Code を一度閉じて開き直してからもう一度打つ。それでもだめなら先輩に言う</p>
+<p><code>command not found</code> と出るものがあったら、VS Code を閉じて開き直してから、もう一度打つ。それでもだめなら先輩に言う</p>
 </li>
 </ol>
 <h3>プロジェクトを取ってくる</h3>
 <ol>
-<li>先輩に GitHub のアカウント名を伝えて、リポジトリに招待してもらう。メールで来る招待を承認して、リポジトリのURLも教えてもらう</li>
+<li>GitHub のアカウントが無ければ、https://github.com で作る</li>
+<li>先輩に GitHub のアカウント名を伝えて、チームのリポジトリ（プログラムや資料の置き場所）に招待してもらう。メールで来る招待を承認して、リポジトリのURLも教えてもらう</li>
 <li>
-<p>Git Bash で、取ってくる（<code>&lt;リポジトリのURL&gt;</code> の所に教えてもらったURLを入れる）</p>
+<p>Git Bash で、デスクトップに取ってくる（<code>&lt;リポジトリのURL&gt;</code> の所に教えてもらったURLを入れる）</p>
 <pre><code>$ cd ~/Desktop
-$ git clone &lt;リポジトリのURL&gt; ETrobo
-$ cd ETrobo</code></pre>
-<p>初めてのときは GitHub へのログインの画面が出るので、ブラウザでログインする</p>
+$ git clone &lt;リポジトリのURL&gt; ETrobo</code></pre>
+<p>初めてのときは GitHub にログインする画面が出るので、ブラウザでログインする</p>
 </li>
 <li>
-<p>VS Code の「ファイル」→「フォルダーを開く」で <code>Desktop/ETrobo</code> を開く</p>
+<p>VS Code の「ファイル」→「フォルダーを開く」で、デスクトップの <code>ETrobo</code> を開く。左に <code>src</code>、<code>docs</code> などのフォルダが並べば成功</p>
 </li>
 </ol>
-<h3>ターミナルの基本</h3>
-<p>ターミナルの行の頭はこうなっています。</p>
-<pre><code>taro@PC MINGW64 ~/Desktop/ETrobo (main)
-$</code></pre>
-<p><code>taro@PC</code> が誰がどのPCで、<code>~/Desktop/ETrobo</code> が今いるフォルダ、<code>(main)</code> は Git のブランチの名前です。<code>$</code> は「ここに打ってください」という印なので、<code>$</code> 自体は打ちません。</p>
-<p>よく使うコマンドはこれくらいです。</p>
-<pre><code>$ pwd                 # 今いるフォルダを表示
-$ ls                  # フォルダの中身を一覧
-$ cd docs             # docs フォルダに入る
-$ cd ..               # 1つ上に戻る
-$ cat README.md       # ファイルの中身を表示
-$ grep LAP README.md  # LAP を含む行だけ表示</code></pre>
-<p>キーは、<code>Tab</code>（ファイル名の続きを補ってくれる）、<code>↑</code>（前に打ったコマンドを呼び出す）、<code>Ctrl + C</code>（動いているものを止める）の3つを覚えておけば困りません。特に <code>Tab</code> は打ち間違いが減るので、どんどん使ってください。</p>
-<p>もっと詳しいことは、去年の資料の <code>docs/後輩育成/02_ターミナルとラズパイ.md</code> と <code>docs/後輩育成/コマンド早見表.md</code> にあります。</p>
+<h3>VS Code の使い方を少しだけ</h3>
+<p>左のファイルの一覧でファイルを押すと、真ん中に中身が出ます。<code>Ctrl + S</code> で保存です。保存していないファイルは、上のタブに白い丸が付きます。</p>
+<p><code>Ctrl + P</code> でファイルの名前を打つと、そのファイルを探して開けます。<code>Ctrl + Shift + F</code> で、全部のファイルの中から文字を探せます。<code>.md</code> のファイルは、開いて <code>Ctrl + Shift + V</code> を押すと見やすく表示されます。</p>
 <h2>演習</h2>
-<h3>演習2-1　フォルダの中を歩く</h3>
-<p><code>ETrobo</code> から <code>cd</code> だけで <code>docs/後輩育成/新人研修2027/ドリル</code> まで移動して、<code>ls</code> で中身を表示してください。移動できたら <code>pwd</code> で場所を確かめて、<code>cd ~/Desktop/ETrobo</code> で戻ります。日本語のフォルダ名は、最初の1文字を打って <code>Tab</code> を押すと補ってくれます。</p>
-<h3>演習2-2　初めてのコンパイル</h3>
-<p><code>ドリル</code> フォルダで <code>sh check.sh</code> を打ってください。まだ何も書いていないので「合格 0 / 12 問」と出れば、gcc もドリルも正しく動いています。</p>
-<details><summary>うまくいかないとき</summary>
-
-`gcc: command not found` なら、手順の「入れる」の4に戻る。`No such file or directory` なら、今いるフォルダが違うので `pwd` で確かめる。
-
-</details>
-
-<h3>演習2-3　探す</h3>
-<p><code>src</code> フォルダの中で、<code>PID</code> という文字が出てくるファイルを探してください（ヒント：<code>grep -r PID src</code>）。いくつのファイルが出てきましたか。それぞれのファイルが何をするものか、ファイル名から想像してみてください。</p>
+<h3>演習2-1　中を見て回る</h3>
+<p>VS Code の左の一覧で、<code>docs/後輩育成/新人研修2027/ドリル</code> を開いて、<code>q01_distance.c</code> を開いてください。最初のコメントに何が書いてありますか。</p>
+<h3>演習2-2　探す</h3>
+<p><code>Ctrl + Shift + F</code> で <code>LAPゲート</code> を探してください。いくつのファイルに出てきましたか。いちばん上に出てきたファイルを開いてみてください。</p>
+<h3>演習2-3　拡張子</h3>
+<p><code>docs/後輩育成</code> の中にある、拡張子が <code>.pdf</code>、<code>.mp4</code>、<code>.md</code> のファイルを1つずつ見つけて、それぞれ何のファイルか想像してください。</p>
 <h2>次回までに</h2>
-<p><code>ドリル/q01_distance.c</code> を VS Code で開いて、先頭のコメント（問題文）を読んでおいてください。</p><div class="pager"><a href="lesson01.html">← 第1回 ETロボコンを知る</a><a href="lesson03.html">第3回 C言語（1）変数・条件・繰り返し →</a></div>
+<p>VS Code で Git Bash を出せるようにしておいてください。次回はずっとターミナルを使います。</p><div class="pager"><a href="lesson01.html">← 第1回 ETロボコンを知る</a><a href="lesson03.html">第3回 ターミナルに慣れる →</a></div>
 </main>
 <footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
 </body>
