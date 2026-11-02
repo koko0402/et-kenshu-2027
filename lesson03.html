@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第3回 C言語（1）変数・条件・繰り返し</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="lesson02.html">前の回</a><a href="lesson04.html">次の回</a></nav>
+</div></header>
+<main>
+<h1>第3回 C言語（1）変数・条件・繰り返し</h1>
+<p>C言語の基本を、走行体で使う計算を題材に練習します。この回でドリルの問題1〜4をやります。</p>
+<p class="prepare">用意するもの：第2回で準備したPC</p>
+<h2>説明</h2>
+<h3>ドリルのしくみ</h3>
+<p><code>ドリル/</code> の中に <code>q01_distance.c</code> から <code>q12_logline.c</code> まで12個のファイルがあります。ファイルの先頭のコメントが問題文で、<code>/* ここに書く */</code> の所を書き換えて関数を完成させます。関数の名前や引数は変えないでください。</p>
+<p>書いたら <code>sh check.sh 1</code> のように問題の番号を付けて採点します。</p>
+<pre><code>$ sh check.sh 1
+問題1  距離から車輪の角度へ（変数と計算）
+  × 314.159mm → 360度  → 0.000 になった（正しくは 360.000）
+  ○ 0mm → 0度
+  ...
+  1 / 4</code></pre>
+<p>× の行には、何を入れたら何が返ってきて、本当は何が正しいかが出ます。</p>
+<h3>変数と型</h3>
+<pre><code>int   reflect = 47;        /* 整数 */
+float distance = 314.2f;   /* 小数。f を付けると float */</code></pre>
+<p>気をつけてほしいのは、int どうしの割り算は小数が切り捨てられることです。<code>3 / 2</code> は 1 になります。小数で計算したいときは、どちらかを <code>(float)3 / 2</code> のように float にします。</p>
+<p>決まった数字は、<code>#define</code> で名前を付けてから使います。</p>
+<pre><code>#define WHEEL_RADIUS_MM 50.0f</code></pre>
+<p>プログラムの中に <code>50.0f</code> と直接書くと、あとで何の数字か分からなくなるからです。2026年のプログラムでは、こういう数字を全部 <code>config/parameters.h</code> に集めていました。</p>
+<h3>条件と繰り返し</h3>
+<pre><code>if (reflect &lt; 20) {
+    /* 黒 */
+} else if (reflect &gt; 70) {
+    /* 白 */
+} else {
+    /* その間 */
+}
+
+for (int i = 0; i &lt; n; i++) {
+    sum += values[i];      /* values[0] から values[n-1] まで */
+}</code></pre>
+<h3>値を2つ返したいとき</h3>
+<p>関数は <code>return</code> で値を1つしか返せません。2つ返したいときは、書き込む先の場所（ポインタ）を受け取ります。</p>
+<pre><code>void find_min_max(const int values[], int n, int *min, int *max)
+{
+    *min = values[0];      /* min が指している場所に書く */
+    ...
+}
+
+int lo, hi;
+find_min_max(data, 6, &amp;lo, &amp;hi);   /* lo と hi の場所を渡す */</code></pre>
+<p><code>*</code> と <code>&amp;</code> は最初は混乱しますが、<code>&amp;lo</code> が「lo の場所」、関数の中の <code>*min</code> が「その場所の中身」と読めば大丈夫です。</p>
+<h2>手順</h2>
+<ol>
+<li>VS Code で <code>ドリル/q01_distance.c</code> を開く</li>
+<li>先頭のコメントを読んで、<code>/* ここに書く */</code> の所を書く</li>
+<li>ターミナルで <code>cd docs/後輩育成/新人研修2027/ドリル</code> して、<code>sh check.sh 1</code> で採点する</li>
+<li>× があれば直して、もう一度採点する。全部 ○ になったら次の問題へ</li>
+</ol>
+<p>コンパイルできないときは、<code>q01_distance.c:8:5: error: expected ';'</code> のように、ファイル名と行番号が出ます。いちばん上の error だけを見て、その行かひとつ上の行を直してください。下に続くエラーは最初のエラーにつられて出ていることが多いので、1つ直したら採点し直したほうが早いです。</p>
+<h2>演習</h2>
+<h3>演習3-1　距離から車輪の角度へ（問題1）</h3>
+<p>走行体を進めたい距離から、車輪（半径50mm）を何度回せばいいかを返す関数を書きます。</p>
+<details><summary>ヒント</summary>
+
+車輪が1回転（360度）すると、円周（2 × π × 50mm）だけ進む。後ろに進むとき（距離がマイナス）も、同じ式でそのまま角度がマイナスになる。
+
+</details>
+
+<h3>演習3-2　明るさで場所を分ける（問題2）</h3>
+<p>カラーセンサの反射光から、黒・線の縁・白のどれを見ているかを返します。</p>
+<details><summary>ヒント</summary>
+
+「20より小さい」は `reflect < 20` なので、20ちょうどは黒に入らない。20と21で動きが変わる所は、実際のプログラムでもバグが出やすいので、テストにも入れてある。
+
+</details>
+
+<h3>演習3-3　平均を出す（問題3）</h3>
+<p>キャリブレーションで読んだ値の平均を返します。</p>
+<details><summary>ヒント</summary>
+
+int どうしの割り算になっていないか確かめる。n が0のときに0で割らないようにする。
+
+</details>
+
+<h3>演習3-4　いちばん暗い・明るい値を探す（問題4）</h3>
+<p>配列の中のいちばん小さい値と大きい値を、ポインタで2つ返します。</p>
+<details><summary>ヒント</summary>
+
+最初の値を「今までで一番小さい（大きい）」として入れておいて、2番目から順に比べていく。
+
+</details>
+
+<h2>次回までに</h2>
+<p>4問とも ○ にしておいてください。時間があれば、<code>ドリル/answer/</code> の答えと自分のを見比べてみてください。採点が通っていれば、書き方が違っていても間違いではありません。どちらが読みやすいかを考えてみてください。</p><div class="pager"><a href="lesson02.html">← 第2回 開発環境とターミナル</a><a href="lesson04.html">第4回 C言語（2）関数・構造体 →</a></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

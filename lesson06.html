@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第6回 シミュレータ（1）ライントレース</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="lesson05.html">前の回</a><a href="lesson07.html">次の回</a></nav>
+</div></header>
+<main>
+<h1>第6回 シミュレータ（1）ライントレース</h1>
+<p>エントリークラスと同じ点数の付け方をする練習用のシミュレータで、自分のプログラムを走らせます。この回は前半のライントレースを、ON/OFF制御から P制御、PD制御へと変えていきます。</p>
+<p class="prepare">用意するもの：第5回までのドリル（特に問題9の PID）</p>
+<h2>説明</h2>
+<h3>シミュレータについて</h3>
+<p>エントリークラスでは、実機を使わずに画面の中の走行体を走らせます。公式のシミュレータは参加登録が済まないと使えないので、練習用に小さなシミュレータを作りました。点数はエントリークラスの規約どおりに付けますが、コースの形は公式とは違います。</p>
+<p><img alt="答えの例で走らせたところ" src="images/シミュレータ_答えの走り.png" /></p>
+<p>左下のスタートから東へ出て、反時計回りに大きく回ります。途中に緑の点線のチェックポイントが5本、そのあとに赤い点線のLAPゲートがあります。LAPゲートの両端にはポールが立っていて、さわるとLAPの5点がもらえません。LAPのあとのブロック運びとガレージは次の回でやります。</p>
+<p>床は白、線は黒で幅20mmです。カラーセンサの反射光は、だいたい白で90、黒で5になります。</p>
+<h3>自分で書くのは my_robot.c だけ</h3>
+<p>シミュレータは10msごとに <code>robot_step()</code> を呼びます。センサの値が <code>sensor</code> に入っているので、それを見て <code>command</code> にモータの出力を書く、というのを繰り返します。</p>
+<pre><code>void robot_step(const Sensor *sensor, Command *command)
+{
+    if (sensor-&gt;reflect &gt; TARGET_REFLECT) {    /* 明るい＝線の外 → 右へ */
+        command-&gt;left_power  = SPEED + TURN;
+        command-&gt;right_power = SPEED - TURN;
+    } else {                                   /* 暗い＝線の上 → 左へ */
+        command-&gt;left_power  = SPEED - TURN;
+        command-&gt;right_power = SPEED + TURN;
+    }
+}</code></pre>
+<p>これが最初に入っている <code>my_robot.c</code> です。線の左の縁をたどっています。明るければ右、暗ければ左に、いつも同じ強さで曲がるだけなので ON/OFF制御といいます。</p>
+<p>センサには、反射光の <code>reflect</code> のほかに、色の <code>color</code>、向きの <code>gyro_deg</code>、左右の車輪の回転角 <code>left_deg</code>・<code>right_deg</code>、正面の物までの距離 <code>sonar_mm</code>、時間の <code>time_ms</code> があります。モータの出力は -100〜100 で、5〜8より小さいと車輪が回りません。詳しくは <code>シミュレータ/robot_api.h</code> を見てください。</p>
+<h3>PDで曲がる量を決める</h3>
+<p>P制御では、ずれに比例して曲がります。</p>
+<pre><code>int error = sensor-&gt;reflect - TARGET_REFLECT;   /* 白に寄ると＋、黒に寄ると− */
+int turn  = (int)(KP * error);
+command-&gt;left_power  = SPEED + turn;
+command-&gt;right_power = SPEED - turn;</code></pre>
+<p>これに、ずれの変わる速さに比例する D を足したのが PD制御です。ここは言葉で読むより、動かしたほうが早いです。下で値を変えると、その場で走り直します。</p>
+<div class="try">
+<canvas id="try-canvas" width="1260" height="840"></canvas>
+<form id="try-form">
+  <label>制御のしかた<br><select id="try-mode">
+    <option value="onoff">ON/OFF（白なら右・黒なら左）</option>
+    <option value="pid" selected>P・D</option></select></label>
+  <label>速さ <span id="try-speed-out"></span><input id="try-speed" type="range" min="20" max="100" step="5" value="70"></label>
+  <label>KP <span id="try-kp-out"></span><input id="try-kp" type="range" min="0" max="8" step="0.1" value="1.0"></label>
+  <label>KD <span id="try-kd-out"></span><input id="try-kd" type="range" min="0" max="20" step="0.5" value="0"></label>
+  <label>seed <span id="try-seed-out"></span><input id="try-seed" type="range" min="0" max="20" step="1" value="0"></label>
+</form>
+<p id="try-result"></p>
+<canvas id="try-chart" width="600" height="120"></canvas>
+<p class="note">下のグラフは最初の10秒の反射光のずれ（目標47との差）。真ん中の線が0。</p>
+</div>
+<script src="course.js"></script>
+<script src="try.js"></script>
+
+
+<h2>手順</h2>
+<ol>
+<li>
+<p>ターミナルでシミュレータのフォルダに入って、走らせる</p>
+<pre><code>$ cd ~/Desktop/ETrobo/docs/後輩育成/新人研修2027/シミュレータ
+$ mingw32-make
+走行ポイント 7.64 ＋ 課題ポイント 26 ＝ リザルトポイント 33.64
+再生: result.html をブラウザで開く</code></pre>
+</li>
+<li>
+<p><code>result.html</code> をダブルクリックして、▶ で再生する。「1倍」を押すと速くなる。右のメッセージをクリックするとその時刻に飛ぶ。画面の下にその瞬間の反射光と、左右のモータに出した値が出る</p>
+</li>
+<li><code>my_robot.c</code> を書き換えたら、もう一度 <code>mingw32-make</code> する（ビルドと実行が一緒に走る）</li>
+</ol>
+<p>seed を変えると、左右のモータの差や、車輪が回り出す出力、ジャイロのずれが少しずつ変わります。実機も1台ずつ癖が違うので、それをまねています。</p>
+<pre><code>$ ./entry_sim --seed 3            # 癖を変える（0 は癖なし）
+$ ./entry_sim --seed 3 --quiet    # 結果だけ表示</code></pre>
+<h2>演習</h2>
+<h3>演習6-1　今の走りを見る</h3>
+<p>そのまま走らせて再生してください。直線なのに左右に振れているのはなぜでしょう。画面の下の「左」「右」の値の変わり方を見て考えてください。</p>
+<details><summary>答え</summary>
+
+ON/OFF制御は、少しでも白なら右に20、少しでも黒なら左に20と、ずれの大きさに関係なく同じだけ曲がる。線の縁の上でずっと右と左を行ったり来たりする。
+
+</details>
+
+<h3>演習6-2　P制御にする</h3>
+<p><code>my_robot.c</code> を P制御に書き換えて、速さを70にします。KP を 0.3、1.0、4、8 と変えて、LAPまでの秒数と様子を表にまとめてください。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>KP</th>
+<th>LAPまで</th>
+<th>様子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1.0</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>8</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>KP が小さすぎるとき、大きすぎるときに、それぞれ何が起きましたか。</p>
+<details><summary>答え（seed 0）</summary>
+
+0.3 は最初のカーブで曲がり切れずに線を外れる。1.0 は12.84秒でなめらか。4 は14.88秒で少し振れる。8 は36.45秒で左右に大きく振れて遅い。小さすぎると曲がり切れず、大きすぎると振れて遅くなる。
+
+</details>
+
+<h3>演習6-3　PD制御で速くする</h3>
+<p>速さを100にして、P だけ（KP 1.0）で seed 1〜10 を走らせてください。種を変えて回すときは、こう書くと1行で済みます。</p>
+<pre><code>for s in 1 2 3 4 5 6 7 8 9 10; do ./entry_sim --seed $s --quiet | tail -1; done</code></pre>
+<p>どこで線を外れましたか。そこに D を足して、10本ともポールにさわらずに LAP まで11秒を切ってください。KD は5〜10くらいから試すといいです。</p>
+<details><summary>答えの例</summary>
+
+KP 1.0、KD 8 で、seed 0〜9 が全部10.2〜10.6秒、ポールなし。
+
+</details>
+
+<h3>演習6-4　スタート直後の動き</h3>
+<p>PD にすると、スタートした直後の一瞬だけ大きく曲がることがあります。再生のいちばん最初の「左」「右」の値を見て、なぜそうなるのか考えてください。どう直せばいいでしょう。</p>
+<details><summary>答え</summary>
+
+1回目は「前回のずれ」が0なので、D が（今のずれ − 0）× KD と大きくなる。1回目だけ D を0にすれば直る。本物の `pid_calculator.c` の `has_prev_error` はこのためにある。
+
+</details>
+
+<h2>次回までに</h2>
+<p>PD制御で seed 1〜10 が全部 LAP まで行く <code>my_robot.c</code> にしておいてください。次回はこれに状態機械を足します。</p><div class="pager"><a href="lesson05.html">← 第5回 C言語（3）PID制御と状態機械</a><a href="lesson07.html">第7回 シミュレータ（2）ブロックを運んでガレージで止まる →</a></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

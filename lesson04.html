@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第4回 C言語（2）関数・構造体</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="lesson03.html">前の回</a><a href="lesson05.html">次の回</a></nav>
+</div></header>
+<main>
+<h1>第4回 C言語（2）関数・構造体</h1>
+<p>関数と構造体を使って、走行体のデータをまとめて扱う練習をします。ドリルの問題5〜8をやります。</p>
+<p class="prepare">用意するもの：第3回のドリルの続き</p>
+<h2>説明</h2>
+<h3>関数に分ける理由</h3>
+<p>モータに出力を渡す前には、必ず -100〜100 に収めます。こういう「毎回同じことをする処理」は関数にしておくと、直すときに1か所で済みます。2026年のプログラムでは、モータに出力を渡す処理は <code>src/device/motor.c</code> の <code>motor_set_power()</code> 1か所にまとめていました。</p>
+<h3>構造体</h3>
+<p>関係のある値をまとめて1つにしたものが構造体です。</p>
+<pre><code>typedef struct {
+    float x_mm;
+    float y_mm;
+    float heading_rad;
+} Pose;
+
+Pose p = {0.0f, 0.0f, 0.0f};
+p.x_mm += 100.0f;</code></pre>
+<p>構造体を関数に渡すときは、ふつうはポインタで渡します。ポインタで受け取ったときは <code>.</code> ではなく <code>-&gt;</code> で中身を使います。</p>
+<pre><code>void odometry_update(Pose *pose, float dl_mm, float dr_mm)
+{
+    pose-&gt;x_mm += ...;     /* (*pose).x_mm と同じ */
+}
+
+odometry_update(&amp;p, 10.0f, 10.0f);</code></pre>
+<h3>前の値を覚えておく</h3>
+<p>センサの値をなめらかにする処理や PID のように、前の値を使う計算はよく出てきます。その「覚えておく値」を構造体に入れておいて、関数に渡すたびに更新します。問題8の移動平均がその練習です。</p>
+<h3>オドメトリ</h3>
+<p>左右の車輪がどれだけ回ったかから、自分の位置と向きを計算することをオドメトリといいます。左右が同じだけ進めばまっすぐ、逆向きに同じだけ進めばその場で回ります。</p>
+<pre><code>進んだ距離 ds = (左 + 右) / 2
+向きの変化 dh = (右 − 左) / 左右の車輪の間隔</code></pre>
+<p>第7回のシミュレータでも、ガレージへ向かうときに進んだ距離や回った角度を使います。</p>
+<h2>手順</h2>
+<p>第3回と同じです。<code>q05_clamp.c</code> から順に開いて書き、<code>sh check.sh 5</code> のように採点します。</p>
+<h2>演習</h2>
+<h3>演習4-1　モータの出力を範囲に収める（問題5）</h3>
+<details><summary>ヒント</summary>
+
+条件を見る順番が大事。先に ±100 の外かを見て、そのあと「0ではないけど小さすぎる」かを見る。なぜ小さい出力をわざわざ大きくするのかは、第6回のシミュレータで出力を5にしてみると分かる（車輪が回らない）。
+
+</details>
+
+<h3>演習4-2　キャリブレーション（問題6）</h3>
+<p>黒と白の明るさから、線の縁の明るさ（目標輝度）を出します。</p>
+<details><summary>ヒント</summary>
+
+`normalize` は、掛け算を先にしないと割り算で0になる。
+
+</details>
+
+<h3>演習4-3　自分の位置を計算する（問題7）</h3>
+<details><summary>ヒント</summary>
+
+テストの「その場で左へ約90度」の110mmは、半径70mmの円の4分の1の長さ。`cosf`・`sinf` は `<math.h>` に入っている。
+
+</details>
+
+<h3>演習4-4　移動平均（問題8）</h3>
+<details><summary>ヒント</summary>
+
+`index = (index + 1) % 5` で 0, 1, 2, 3, 4, 0, ... と回して、古い値に上書きしていく。最初のうちは5個そろっていないので、たまっている数で割る。
+
+</details>
+
+<h3>演習4-5　読み比べ</h3>
+<p><code>src/localization/odometry_math.c</code> を開いて、自分の問題7の答えと見比べてください。同じ式はどこにありますか。違うところはありますか。</p>
+<h2>次回までに</h2>
+<p>問題8まで ○ にしておいてください。次回は PID と状態機械で、ここからシミュレータにつながります。</p><div class="pager"><a href="lesson03.html">← 第3回 C言語（1）変数・条件・繰り返し</a><a href="lesson05.html">第5回 C言語（3）PID制御と状態機械 →</a></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

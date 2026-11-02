@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第5回 C言語（3）PID制御と状態機械</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a><a href="lesson04.html">前の回</a><a href="lesson06.html">次の回</a></nav>
+</div></header>
+<main>
+<h1>第5回 C言語（3）PID制御と状態機械</h1>
+<p>走行体のプログラムの中心になる2つ、PID制御と状態機械を書きます。ドリルの問題9〜12をやります。ここで書いたものは、次の回からシミュレータでそのまま使います。</p>
+<p class="prepare">用意するもの：第4回のドリルの続き</p>
+<h2>説明</h2>
+<h3>PID制御</h3>
+<p>ライントレースでは、カラーセンサで線の縁を見て、明るすぎたら線のほうへ、暗すぎたら線の外へ曲がります。どれだけ曲がるかを決める方法の一つが PID制御です。</p>
+<p>ずれ（error）を「今の明るさ − 目標の明るさ」とすると、</p>
+<pre><code>P = KP × 今のずれ
+I = KI × これまでのずれの合計
+D = KD × （今のずれ − 前回のずれ）
+曲がる量 = P + I + D</code></pre>
+<p>P は今どれだけずれているか、I はずれがどれだけたまっているか、D はずれがどれだけ速く変わっているかを見ています。ライントレースでは I はあまり使わず、P と D で走ることが多いです。どの値がどう効くかは、第6回にシミュレータで実際に見ます。</p>
+<p>D を計算するには前回のずれが要るので、それを構造体に覚えておきます（第4回の「前の値を覚えておく」と同じです）。</p>
+<h3>状態機械</h3>
+<p>走行体は、区間によってやることが変わります。線をたどる、ブロックに近づく、押す、下がる、回る……。今どれをやっているかを「状態」として持っておいて、何かが起きたら次の状態に移る、という作り方を状態機械といいます。</p>
+<p>C では <code>enum</code> で状態に名前を付けて、<code>switch</code> で切り替えます。</p>
+<pre><code>typedef enum { ST_IDLE, ST_RUNNING, ST_STOPPED } State;
+
+switch (state) {
+case ST_IDLE:
+    if (button_pressed) state = ST_RUNNING;
+    break;
+case ST_RUNNING:
+    if (goal_reached) state = ST_STOPPED;
+    break;
+...
+}</code></pre>
+<p>モデル図の状態機械図と、このコードはそのまま対応します。図の矢印1本が、<code>case</code> の中の <code>if</code> 1つです。モデル審査で「モデルとコードが対応しているか」を見られるのは、こういうところです。</p>
+<h3>見間違いを防ぐ</h3>
+<p>センサやカメラは、一瞬だけ違う値を出すことがあります。2026年は青い印を一瞬見間違えて、早く曲がってしまうことがありました。「何回か続けて見えたら本物とみなす」ようにすると防げます。問題11がその練習です。</p>
+<h2>手順</h2>
+<p>これまでと同じです。<code>q09_pid.c</code> から順に書いて採点します。最後に <code>sh check.sh</code> で全部まとめて採点して、「合格 12 / 12 問」になれば終わりです。</p>
+<h2>演習</h2>
+<h3>演習5-1　PID制御（問題9）</h3>
+<details><summary>ヒント</summary>
+
+前回のずれ（`prev_error`）を更新するのは、D を計算したあと。
+
+</details>
+
+<h3>演習5-2　状態機械（問題10）</h3>
+<details><summary>ヒント</summary>
+
+非常停止は「どの状態からでも」なので、`switch` に入る前に1回見れば済む。
+
+</details>
+
+<h3>演習5-3　見間違いを防ぐ（問題11）</h3>
+<details><summary>ヒント</summary>
+
+`false` が来たら数え直し。`true` なら1増やして、決めた回数に届いたら `true` を返す。
+
+</details>
+
+<h3>演習5-4　ログの1行を読む（問題12）</h3>
+<details><summary>ヒント</summary>
+
+`sscanf` は読めた個数を返す。4つ全部読めたときだけ成功にする。
+
+</details>
+
+<h3>演習5-5　状態機械図を描く</h3>
+<p>問題10の状態機械を、紙に状態機械図として描いてください。状態を角の丸い四角、移り変わりを矢印にして、矢印に「何が起きたら」を書きます。描いたら自分のコードと見比べて、矢印と <code>if</code> が1対1になっているか確かめます。</p>
+<h3>演習5-6　本物と比べる</h3>
+<p><code>src/judge/pid_calculator.c</code> を開いて、自分の問題9の答えとどこが違うか探してください。</p>
+<details><summary>答え</summary>
+
+周期（dt）で割っていることと、1回目だけ D を0にしていること（`has_prev_error`）。1回目の D を0にする理由は、第6回の演習で分かる。
+
+</details>
+
+<h2>次回までに</h2>
+<p>12問全部 ○ にしておいてください。</p><div class="pager"><a href="lesson04.html">← 第4回 C言語（2）関数・構造体</a><a href="lesson06.html">第6回 シミュレータ（1）ライントレース →</a></div>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>

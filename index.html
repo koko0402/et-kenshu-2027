@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ETロボコン 新人研修 2027</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="inner">
+<a class="title" href="index.html">ETロボコン 新人研修 2027</a>
+<nav><a href="index.html">授業一覧</a></nav>
+</div></header>
+<main>
+<h1>ETロボコン 新人研修 2027</h1>
+<p>2026年11月に入ってくれた人向けの研修です。来年のETロボコンに向けて、1か月で11回の授業をします。</p>
+<p>大会のしくみを知るところから始めて、C言語で走行体の計算を書き、練習用のシミュレータで自分のプログラムを走らせて、状態機械図を描き、最後にラズパイを実際につなぎます。各回に説明と手順と演習があります。演習の答えは、自分でやってから開いてください。</p>
+<h2>授業一覧</h2>
+<div class="table-wrap"><table class="lessons"><tr><th>回</th><th>内容</th></tr><tr><td><a href="lesson01.html">第1回 ETロボコンを知る</a></td><td>この回は講義が中心です。</td></tr><tr><td><a href="lesson02.html">第2回 開発環境とターミナル</a></td><td>自分のPCで、Cのプログラムを書いてコンパイルして動かせるようにします。</td></tr><tr><td><a href="lesson03.html">第3回 C言語（1）変数・条件・繰り返し</a></td><td>C言語の基本を、走行体で使う計算を題材に練習します。</td></tr><tr><td><a href="lesson04.html">第4回 C言語（2）関数・構造体</a></td><td>関数と構造体を使って、走行体のデータをまとめて扱う練習をします。</td></tr><tr><td><a href="lesson05.html">第5回 C言語（3）PID制御と状態機械</a></td><td>走行体のプログラムの中心になる2つ、PID制御と状態機械を書きます。</td></tr><tr><td><a href="lesson06.html">第6回 シミュレータ（1）ライントレース</a></td><td>エントリークラスと同じ点数の付け方をする練習用のシミュレータで、自分のプログラムを走らせます。</td></tr><tr><td><a href="lesson07.html">第7回 シミュレータ（2）ブロックを運んでガレージで止まる</a></td><td>前回のライントレースに状態機械を足して、LAPのあとのブロック運びとガレージ停止までを作ります。</td></tr><tr><td><a href="lesson08.html">第8回 状態機械図を描く</a></td><td>前回作った走行体のプログラムを、モデル（状態機械図）にします。</td></tr><tr><td><a href="lesson09.html">第9回 ラズパイをつなぐ（実習）</a></td><td>ここからは実機です。</td></tr><tr><td><a href="lesson10.html">第10回 AIとの付き合い方</a></td><td>2026年のチームは、プログラムや設計書、資料の多くを、生成AI（VS Code の中で動く Claude Code）と一緒に作りました。</td></tr><tr><td><a href="lesson11.html">第11回 まとめの発表</a></td><td>1か月の最後に、自分の作ったものを先輩の前で5分くらいで説明してもらいます。</td></tr></table></div>
+<h2>進め方</h2>
+<p>1週目に第1回と第2回、2週目に第3回から第6回、3週目に第7回と第8回、4週目に第9回から第11回、くらいのペースを考えています。ドリルやシミュレータは、授業の時間だけで終わらなければ次の回までにやってきてください。</p>
+<p>第11回では、自分の作ったものを5分くらいで説明してもらいます。うまく走ったかどうかより、なぜそう作ったのかを聞きます。</p>
+<h2>準備</h2>
+<p>ドリルとシミュレータは、PCで gcc・mingw32-make・Git が動けばできます（入れ方は第2回）。ラズパイと実機を使うのは第9回だけです。</p>
+<h2>教材の場所</h2>
+<p>この研修の教材は、プロジェクトの <code>docs/後輩育成/新人研修2027/</code> にあります。</p>
+<ul>
+<li><code>ドリル/</code> … C言語ドリル12問。<code>sh check.sh</code> で採点</li>
+<li><code>シミュレータ/</code> … 練習用のシミュレータ。自分で書くのは <code>my_robot.c</code> だけ</li>
+<li><code>スライド_新人研修2027.pptx</code> … 第1回の最初に使うスライド</li>
+<li><code>授業/</code> … このサイトの原稿。間違いや分かりにくい所を見つけたら、ここを直す</li>
+</ul>
+<p>去年（2026年10月）の資料は <code>docs/後輩育成/</code> にあります。ターミナルのコマンドやモデル図の描き方は、そちらのほうが詳しく書いてあります。</p>
+</main>
+<footer class="site">ETロボコン2026 アプライドクラス出場チーム　原稿は docs/後輩育成/新人研修2027/授業/</footer>
+</body>
+</html>
